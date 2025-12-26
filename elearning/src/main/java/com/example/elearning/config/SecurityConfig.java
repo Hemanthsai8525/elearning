@@ -49,6 +49,8 @@ public class SecurityConfig {
                 // 🔐 Teacher only
                 .requestMatchers(HttpMethod.POST, "/api/courses").hasRole("TEACHER")
                 .requestMatchers(HttpMethod.POST, "/api/courses/*/lessons").hasRole("TEACHER")
+                .requestMatchers("/api/upload/**").hasRole("TEACHER")
+
 
                 // 🔐 Authenticated users
                 .requestMatchers(HttpMethod.GET, "/api/courses").authenticated()

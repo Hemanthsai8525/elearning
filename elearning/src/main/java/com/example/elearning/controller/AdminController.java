@@ -14,17 +14,16 @@ import jakarta.validation.Valid;
 @RestController
 @RequestMapping("/api/admin")
 public class AdminController {
-	
-	 private final AdminService adminService;
 
-	    public AdminController(AdminService adminService) {
-	        this.adminService = adminService;
-	    }
+	private final AdminService adminService;
 
-	    @PostMapping("/create-teacher")
-	    public UserResponseDTO createTeacher(
-	            @Valid @RequestBody CreateTeacherRequestDTO dto) {
-	        return adminService.createTeacher(dto);
-	    }
+	public AdminController(AdminService adminService) {
+		this.adminService = adminService;
+	}
+
+	@PostMapping("/create-teacher")
+	public UserResponseDTO createTeacher(@Valid @RequestBody CreateTeacherRequestDTO dto) {
+		return adminService.createTeacher(dto);
+	}
 
 }
