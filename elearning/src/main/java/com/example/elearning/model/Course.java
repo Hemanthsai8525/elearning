@@ -30,6 +30,13 @@ public class Course {
 
     @Column(nullable = false)
     private boolean published = true;
+    
+    @Column(nullable = false)
+    private boolean paid = false;
+
+    @Column(nullable = false)
+    private Double price = 0.0;
+
 
 	public Long getId() {
 		return id;
@@ -70,6 +77,23 @@ public class Course {
 	public void setPublished(boolean published) {
 		this.published = published;
 	}
+
+	public boolean isPaid() {
+		return paid;
+	}
+
+	public void setPaid(boolean paid) {
+		this.paid = paid;
+	}
+
+	public Double getPrice() {
+		return price;
+	}
+
+	public void setPrice(Double price) {
+		this.price = price;
+	}
+	
 	
 
 }

@@ -4,15 +4,34 @@ public class CourseResponseDTO {
 	private Long id;
 	private String title;
 	private String description;
+	private boolean paid;
+	private Double price;
 	private String teacherName;
-	
 
-	public CourseResponseDTO(Long id, String title, String description, String teacherName) {
-		super();
+	public CourseResponseDTO(Long id, String title, String description, boolean paid, Double price,
+			String teacherName) {
 		this.id = id;
 		this.title = title;
 		this.description = description;
+		this.paid = paid;
+		this.price = price;
 		this.teacherName = teacherName;
+	}
+
+	public boolean isPaid() {
+		return paid;
+	}
+
+	public void setPaid(boolean paid) {
+		this.paid = paid;
+	}
+
+	public Double getPrice() {
+		return price;
+	}
+
+	public void setPrice(Double price) {
+		this.price = price;
 	}
 
 	public Long getId() {

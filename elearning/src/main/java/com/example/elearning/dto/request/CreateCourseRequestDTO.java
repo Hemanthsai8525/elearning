@@ -8,6 +8,11 @@ public class CreateCourseRequestDTO {
 	
 	@NotBlank
 	private String description;
+	
+	private boolean paid;
+    private Double price;
+    
+    
 
 	public String getTitle() {
 		return title;
@@ -24,5 +29,23 @@ public class CreateCourseRequestDTO {
 	public void setDescription(String description) {
 		this.description = description;
 	}
+
+	public boolean isPaid() {
+		return paid;
+	}
+
+	public void setPaid(boolean paid) {
+		this.paid = paid;
+	}
+
+	public Double getPrice() {
+		return price;
+	}
+
+	public void setPrice(Double price) {
+		this.price = price;
+	}
+	
+	
 
 }

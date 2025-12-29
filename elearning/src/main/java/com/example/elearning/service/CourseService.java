@@ -40,7 +40,10 @@ public class CourseService {
         Course course = new Course();
         course.setTitle(dto.getTitle());
         course.setDescription(dto.getDescription());
+        course.setPaid(dto.isPaid());
+        course.setPrice(dto.isPaid() ? dto.getPrice() : 0.0);
         course.setTeacher(teacher);
+        course.setPublished(true);
 
         Course saved = courseRepo.save(course);
 
@@ -48,21 +51,41 @@ public class CourseService {
                 saved.getId(),
                 saved.getTitle(),
                 saved.getDescription(),
+                saved.isPaid(),
+                saved.getPrice(),
                 teacher.getName()
         );
     }
 
+
     // STUDENT + TEACHER
     public List<CourseResponseDTO> getAllCourses() {
-        return courseRepo.findByPublishedTrue()
-                .stream()
+
+        String email = SecurityContextHolder.getContext()
+                .getAuthentication().getName();
+
+        User user = userRepo.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        List<Course> courses;
+
+        if (user.getRole() == Role.TEACHER) {
+            courses = courseRepo.findByTeacherId(user.getId());
+        } else {
+            courses = courseRepo.findByPublishedTrue();
+        }
+
+        return courses.stream()
                 .map(c -> new CourseResponseDTO(
                         c.getId(),
                         c.getTitle(),
                         c.getDescription(),
+                        c.isPaid(),
+                        c.getPrice(),
                         c.getTeacher().getName()
                 ))
                 .toList();
     }
+
 
 }

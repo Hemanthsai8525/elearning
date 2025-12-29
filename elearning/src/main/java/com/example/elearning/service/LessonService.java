@@ -12,6 +12,7 @@ import com.example.elearning.model.Lesson;
 import com.example.elearning.model.Role;
 import com.example.elearning.model.User;
 import com.example.elearning.repository.CourseRepository;
+import com.example.elearning.repository.EnrollmentRepository;
 import com.example.elearning.repository.LessonRepository;
 import com.example.elearning.repository.UserRepository;
 
@@ -21,13 +22,15 @@ public class LessonService {
 	private final LessonRepository lessonRepo;
     private final CourseRepository courseRepo;
     private final UserRepository userRepo;
+    private final EnrollmentRepository enrollmentRepo;
 
     public LessonService(LessonRepository lessonRepo,
                          CourseRepository courseRepo,
-                         UserRepository userRepo) {
+                         UserRepository userRepo, EnrollmentRepository enrollmentRepo) {
         this.lessonRepo = lessonRepo;
         this.courseRepo = courseRepo;
         this.userRepo = userRepo;
+		this.enrollmentRepo = enrollmentRepo;
     }
 
     // TEACHER ONLY – add lesson to own course
@@ -70,6 +73,27 @@ public class LessonService {
     // STUDENT + TEACHER – view lessons
     public List<LessonResponseDTO> getLessonsByCourse(Long courseId) {
 
+        String email = SecurityContextHolder.getContext()
+                .getAuthentication().getName();
+
+        User user = userRepo.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        Course course = courseRepo.findById(courseId)
+                .orElseThrow(() -> new RuntimeException("Course not found"));
+
+        // STUDENT → must be enrolled
+        if (user.getRole() == Role.STUDENT) {
+            enrollmentRepo.findByStudentIdAndCourseId(user.getId(), courseId)
+                    .orElseThrow(() -> new RuntimeException("Not enrolled in this course"));
+        }
+
+        // TEACHER → must own course
+        if (user.getRole() == Role.TEACHER &&
+            !course.getTeacher().getId().equals(user.getId())) {
+            throw new RuntimeException("You do not own this course");
+        }
+
         return lessonRepo.findByCourseIdOrderByLessonOrderAsc(courseId)
                 .stream()
                 .map(l -> new LessonResponseDTO(
@@ -80,5 +104,6 @@ public class LessonService {
                 ))
                 .toList();
     }
+
 
 }

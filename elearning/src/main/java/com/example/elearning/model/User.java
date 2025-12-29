@@ -16,32 +16,38 @@ import jakarta.persistence.UniqueConstraint;
 @Table(name = "users", uniqueConstraints = @UniqueConstraint(columnNames = "email"))
 public class User {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 
-    @Column(nullable = false, length = 100)
-    private String name;
+	@Column(nullable = false, length = 100)
+	private String name;
 
-    @Column(nullable = false, unique = true, length = 120)
-    private String email;
+	@Column(nullable = false, unique = true, length = 120)
+	private String email;
 
-    @Column(nullable = false)
-    private String password;
+	@Column(nullable = false)
+	private String password;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private Role role;
+	@Enumerated(EnumType.STRING)
+	@Column(nullable = false)
+	private Role role;
 
-    private boolean enabled = true;
-    
-    @Column(nullable = false)
-    private boolean approved = false;
+	private boolean enabled = true;
 
+	@Column(nullable = false)
+	private boolean approved = false;
 
-    public boolean isApproved() {
-		return approved;
-	}
+	@Column(nullable = false)
+	private boolean emailVerified = false;
+
+	private String emailVerificationToken;
+
+	private LocalDateTime emailVerificationTokenExpiry;
+
+	private String passwordResetToken;
+
+	private LocalDateTime passwordResetTokenExpiry;
 
 	private LocalDateTime createdAt = LocalDateTime.now();
 
@@ -104,6 +110,49 @@ public class User {
 	public void setApproved(boolean b) {
 		this.approved = b;
 	}
-    
-    
+
+	public boolean isApproved() {
+		return approved;
+	}
+
+	public boolean isEmailVerified() {
+		return emailVerified;
+	}
+
+	public void setEmailVerified(boolean emailVerified) {
+		this.emailVerified = emailVerified;
+	}
+
+	public String getEmailVerificationToken() {
+		return emailVerificationToken;
+	}
+
+	public void setEmailVerificationToken(String emailVerificationToken) {
+		this.emailVerificationToken = emailVerificationToken;
+	}
+
+	public LocalDateTime getEmailVerificationTokenExpiry() {
+		return emailVerificationTokenExpiry;
+	}
+
+	public void setEmailVerificationTokenExpiry(LocalDateTime emailVerificationTokenExpiry) {
+		this.emailVerificationTokenExpiry = emailVerificationTokenExpiry;
+	}
+
+	public String getPasswordResetToken() {
+		return passwordResetToken;
+	}
+
+	public void setPasswordResetToken(String passwordResetToken) {
+		this.passwordResetToken = passwordResetToken;
+	}
+
+	public LocalDateTime getPasswordResetTokenExpiry() {
+		return passwordResetTokenExpiry;
+	}
+
+	public void setPasswordResetTokenExpiry(LocalDateTime passwordResetTokenExpiry) {
+		this.passwordResetTokenExpiry = passwordResetTokenExpiry;
+	}
+
 }
