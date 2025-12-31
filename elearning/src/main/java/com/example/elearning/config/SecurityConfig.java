@@ -29,16 +29,16 @@ public class SecurityConfig {
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
-		http.cors(cors -> cors.configure(http)) // Enable CORS
+		http.cors(org.springframework.security.config.Customizer.withDefaults())
 				.csrf(csrf -> csrf.disable())
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.authorizeHttpRequests(auth -> auth
 
 						// 🔓 Public endpoints
 						.requestMatchers("/api/auth/**", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
-						.requestMatchers(HttpMethod.GET, "/api/courses").permitAll() // Browse courses publicly
-						.requestMatchers("/api/courses/*/preview").permitAll() // Course preview for non-enrolled users
-						.requestMatchers("/api/certificates/verify/**").permitAll() // Public certificate verification
+						.requestMatchers(HttpMethod.GET, "/api/courses").permitAll()
+						.requestMatchers("/api/courses/*/preview").permitAll()
+						.requestMatchers("/api/certificates/verify/**").permitAll()
 
 						// 🔐 Admin only
 						.requestMatchers("/api/admin/**").hasRole("ADMIN")
@@ -46,19 +46,25 @@ public class SecurityConfig {
 						// 🔐 Student only
 						.requestMatchers("/api/progress/**").hasRole("STUDENT")
 						.requestMatchers(HttpMethod.POST, "/api/enrollments/**").hasRole("STUDENT")
-						.requestMatchers(HttpMethod.GET, "/api/enrollments/**").hasRole("STUDENT")
+						.requestMatchers(HttpMethod.GET, "/api/enrollments/me").authenticated()
 						.requestMatchers("/api/payments/**").hasRole("STUDENT")
 						.requestMatchers("/api/certificates/generate/**").hasRole("STUDENT")
 						.requestMatchers("/api/certificates/my").hasRole("STUDENT")
 
 						// 🔐 Teacher only
 						.requestMatchers(HttpMethod.POST, "/api/courses").hasRole("TEACHER")
-						.requestMatchers(HttpMethod.POST, "/api/courses/*/lessons").hasRole("TEACHER")
+						.requestMatchers(HttpMethod.POST, "/api/courses/{courseId}/lessons").hasRole("TEACHER")
+						.requestMatchers(HttpMethod.GET, "/api/enrollments/course/{courseId}/students")
+						.hasRole("TEACHER")
 						.requestMatchers("/api/upload/**").hasRole("TEACHER")
+						.requestMatchers(HttpMethod.POST, "/api/courses/{courseId}/tasks").hasRole("TEACHER")
+
+						// 🔐 Tasks (Student)
+						.requestMatchers(HttpMethod.POST, "/api/tasks/{taskId}/complete").hasRole("STUDENT")
 
 						// 🔐 Authenticated users
-						.requestMatchers("/api/users/**").authenticated() // Profile management
-						.requestMatchers(HttpMethod.GET, "/api/courses/*/lessons").authenticated()
+						.requestMatchers("/api/users/**").authenticated()
+						.requestMatchers(HttpMethod.GET, "/api/courses/{courseId}/lessons").authenticated()
 
 						// 🔐 Everything else
 						.anyRequest().authenticated())

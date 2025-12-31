@@ -14,4 +14,6 @@ public interface LessonRepository extends JpaRepository<Lesson, Long> {
     default List<Lesson> findByCourseIdOrderByOrderIndexAsc(Long courseId) {
         return findByCourseIdOrderByLessonOrderAsc(courseId);
     }
+
+    List<Lesson> findByCourseId(Long courseId);
 }

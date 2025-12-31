@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.elearning.dto.response.EnrolledStudentDTO;
 import com.example.elearning.dto.response.EnrollmentResponseDTO;
 import com.example.elearning.service.EnrollmentService;
 
@@ -29,5 +30,15 @@ public class EnrollmentController {
 	@GetMapping("/me")
 	public List<EnrollmentResponseDTO> myEnrollments() {
 		return service.myEnrollments();
+	}
+
+	@GetMapping("/course/{courseId}/students")
+	public List<EnrolledStudentDTO> getCourseEnrollees(@PathVariable Long courseId) {
+		return service.getStudentsEnrolledInCourse(courseId);
+	}
+
+	@GetMapping("/{courseId}/check")
+	public boolean checkEnrollment(@PathVariable Long courseId) {
+		return service.isEnrolled(courseId);
 	}
 }

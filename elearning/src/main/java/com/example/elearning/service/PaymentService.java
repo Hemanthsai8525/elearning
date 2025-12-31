@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import com.example.elearning.event.PaymentSuccessEvent;
 import com.example.elearning.model.Course;
 import com.example.elearning.model.Payment;
+import com.example.elearning.model.Role;
 import com.example.elearning.model.User;
 import com.example.elearning.repository.CourseRepository;
 import com.example.elearning.repository.PaymentRepository;
@@ -28,16 +29,19 @@ public class PaymentService {
 		this.publisher = publisher;
 	}
 
-	public void simulatePayment(Long courseId) {
-
+	public void mockPay(Long courseId) {
 		String email = SecurityContextHolder.getContext().getAuthentication().getName();
-
 		User student = userRepo.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
+
+		if (student.getRole() != Role.STUDENT) {
+			throw new RuntimeException("Only students can make payments");
+		}
 
 		Course course = courseRepo.findById(courseId).orElseThrow(() -> new RuntimeException("Course not found"));
 
-		if (!course.isPaid()) {
-			throw new RuntimeException("Course is free");
+		// Check if already paid
+		if (paymentRepo.findByStudentIdAndCourseIdAndStatus(student.getId(), courseId, "SUCCESS").isPresent()) {
+			return; // Already paid
 		}
 
 		Payment payment = new Payment();
@@ -45,12 +49,11 @@ public class PaymentService {
 		payment.setCourse(course);
 		payment.setAmount(course.getPrice());
 		payment.setStatus("SUCCESS");
-		payment.setProvider("SIMULATED");
+		payment.setProvider("MOCK_PAYMENT");
+		payment.setProviderPaymentId("MOCK_" + System.currentTimeMillis());
 
-		paymentRepo.save(payment);
-		publisher.publishEvent(
-		    new PaymentSuccessEvent(student, course, course.getPrice())
-		);
+		Payment saved = paymentRepo.save(payment);
 
+		publisher.publishEvent(new PaymentSuccessEvent(student, course, saved.getAmount()));
 	}
 }

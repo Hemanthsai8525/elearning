@@ -13,30 +13,39 @@ import jakarta.persistence.Table;
 @Entity
 @Table(name = "courses")
 public class Course {
-	
+
 	@Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 
-    @Column(nullable = false, length = 150)
-    private String title;
+	@Column(nullable = false, length = 150)
+	private String title;
 
-    @Column(nullable = false, length = 500)
-    private String description;
+	@Column(nullable = false, length = 500)
+	private String description;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "teacher_id", nullable = false)
-    private User teacher;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "teacher_id", nullable = false)
+	private User teacher;
 
-    @Column(nullable = false)
-    private boolean published = true;
-    
-    @Column(nullable = false)
-    private boolean paid = false;
+	@Column(nullable = false)
+	private boolean published = true;
 
-    @Column(nullable = false)
-    private Double price = 0.0;
+	@Column(nullable = false)
+	private boolean paid = false;
 
+	@Column(nullable = false)
+	private Double price = 0.0;
+
+	private java.time.LocalDateTime createdAt = java.time.LocalDateTime.now();
+
+	public java.time.LocalDateTime getCreatedAt() {
+		return createdAt;
+	}
+
+	public void setCreatedAt(java.time.LocalDateTime createdAt) {
+		this.createdAt = createdAt;
+	}
 
 	public Long getId() {
 		return id;
@@ -93,7 +102,5 @@ public class Course {
 	public void setPrice(Double price) {
 		this.price = price;
 	}
-	
-	
 
 }

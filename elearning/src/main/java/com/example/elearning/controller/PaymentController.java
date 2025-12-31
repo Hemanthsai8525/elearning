@@ -17,9 +17,9 @@ public class PaymentController {
 		this.service = service;
 	}
 
-	@PostMapping("/courses/{courseId}")
-	public void pay(@PathVariable Long courseId) {
-		service.simulatePayment(courseId);
+	@PostMapping("/pay/{courseId}")
+	public String pay(@PathVariable Long courseId) {
+		service.mockPay(courseId);
+		return "Payment Successful";
 	}
-
 }

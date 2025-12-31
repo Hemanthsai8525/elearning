@@ -15,8 +15,8 @@ import com.example.elearning.repository.UserRepository;
 
 @Service
 public class CourseService {
-	
-	private final CourseRepository courseRepo;
+
+    private final CourseRepository courseRepo;
     private final UserRepository userRepo;
 
     public CourseService(CourseRepository courseRepo, UserRepository userRepo) {
@@ -53,16 +53,19 @@ public class CourseService {
                 saved.getDescription(),
                 saved.isPaid(),
                 saved.getPrice(),
-                teacher.getName()
-        );
+                teacher.getName());
     }
 
-
-    // STUDENT + TEACHER
+    // STUDENT + TEACHER + PUBLIC
     public List<CourseResponseDTO> getAllCourses() {
 
-        String email = SecurityContextHolder.getContext()
-                .getAuthentication().getName();
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        if (email == null || email.equals("anonymousUser")) {
+            return courseRepo.findByPublishedTrue().stream()
+                    .map(this::mapToDTO) // Refactored to helper method for cleanliness
+                    .toList();
+        }
 
         User user = userRepo.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -72,20 +75,22 @@ public class CourseService {
         if (user.getRole() == Role.TEACHER) {
             courses = courseRepo.findByTeacherId(user.getId());
         } else {
-            courses = courseRepo.findByPublishedTrue();
+            courses = courseRepo.findByPublishedTrue(); // Students and others see published courses
         }
 
         return courses.stream()
-                .map(c -> new CourseResponseDTO(
-                        c.getId(),
-                        c.getTitle(),
-                        c.getDescription(),
-                        c.isPaid(),
-                        c.getPrice(),
-                        c.getTeacher().getName()
-                ))
+                .map(this::mapToDTO)
                 .toList();
     }
 
+    private CourseResponseDTO mapToDTO(Course c) {
+        return new CourseResponseDTO(
+                c.getId(),
+                c.getTitle(),
+                c.getDescription(),
+                c.isPaid(),
+                c.getPrice(),
+                c.getTeacher().getName());
+    }
 
 }
