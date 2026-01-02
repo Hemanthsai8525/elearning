@@ -1,5 +1,4 @@
 package com.example.elearning.dto.response;
-
 public class AuthResponseDTO {
 	private String token;
 	private UserResponseDTO user;
@@ -20,6 +19,4 @@ public class AuthResponseDTO {
 		this.token = token;
 		this.user = user;
 	}
-	
-	
 }

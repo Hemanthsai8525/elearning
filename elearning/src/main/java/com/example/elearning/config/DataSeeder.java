@@ -1,5 +1,4 @@
 package com.example.elearning.config;
-
 import com.example.elearning.model.Course;
 import com.example.elearning.model.Lesson;
 import com.example.elearning.model.Role;
@@ -10,17 +9,13 @@ import com.example.elearning.repository.UserRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
-
 import java.time.LocalDateTime;
-
 @Component
 public class DataSeeder implements CommandLineRunner {
-
     private final UserRepository userRepo;
     private final CourseRepository courseRepo;
     private final LessonRepository lessonRepo;
     private final PasswordEncoder encoder;
-
     public DataSeeder(UserRepository userRepo, CourseRepository courseRepo, LessonRepository lessonRepo,
             PasswordEncoder encoder) {
         this.userRepo = userRepo;
@@ -28,11 +23,8 @@ public class DataSeeder implements CommandLineRunner {
         this.lessonRepo = lessonRepo;
         this.encoder = encoder;
     }
-
     @Override
     public void run(String... args) throws Exception {
-
-        // 1. Create Teacher
         if (!userRepo.existsByEmail("teacher@example.com")) {
             User teacher = new User();
             teacher.setName("John Instructor");
@@ -43,8 +35,6 @@ public class DataSeeder implements CommandLineRunner {
             userRepo.save(teacher);
             System.out.println("✅ Seeded Teacher: teacher@example.com / teacher123");
         }
-
-        // 2. Create Student
         if (!userRepo.existsByEmail("student@example.com")) {
             User student = new User();
             student.setName("Alice Student");
@@ -55,10 +45,7 @@ public class DataSeeder implements CommandLineRunner {
             userRepo.save(student);
             System.out.println("✅ Seeded Student: student@example.com / student123");
         }
-
-        // 3. Create Demo Course
         User teacher = userRepo.findByEmail("teacher@example.com").orElseThrow();
-
         Course course;
         if (courseRepo.findByTeacherId(teacher.getId()).isEmpty()) {
             course = new Course();
@@ -74,24 +61,19 @@ public class DataSeeder implements CommandLineRunner {
         } else {
             course = courseRepo.findByTeacherId(teacher.getId()).get(0);
         }
-
-        // 4. Add "Fake" Video Lesson
         if (lessonRepo.findByCourseId(course.getId()).isEmpty()) {
             Lesson lesson1 = new Lesson();
             lesson1.setTitle("Introduction to React");
-            // Using a dummy MP4 link for testing
-            lesson1.setVideoUrl("https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4");
+            lesson1.setVideoUrl("https:
             lesson1.setLessonOrder(1);
             lesson1.setCourse(course);
             lessonRepo.save(lesson1);
-
             Lesson lesson2 = new Lesson();
             lesson2.setTitle("Components & Props");
-            lesson2.setVideoUrl("https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4");
+            lesson2.setVideoUrl("https:
             lesson2.setLessonOrder(2);
             lesson2.setCourse(course);
             lessonRepo.save(lesson2);
-
             System.out.println("✅ Seeded 2 Lessons.");
         }
     }

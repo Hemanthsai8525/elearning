@@ -1,5 +1,4 @@
 package com.example.elearning.dto.response;
-
 public class UserResponseDTO {
 	private Long id;
     private String name;
@@ -36,7 +35,4 @@ public class UserResponseDTO {
 		this.email = email;
 		this.role = role;
 	}
-    
-    
-
 }
