@@ -1,4 +1,5 @@
 package com.example.elearning.service;
+
 import java.util.List;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -12,12 +13,14 @@ import com.example.elearning.repository.CourseRepository;
 import com.example.elearning.repository.EnrollmentRepository;
 import com.example.elearning.repository.LessonRepository;
 import com.example.elearning.repository.UserRepository;
+
 @Service
 public class LessonService {
         private final LessonRepository lessonRepo;
         private final CourseRepository courseRepo;
         private final UserRepository userRepo;
         private final EnrollmentRepository enrollmentRepo;
+
         public LessonService(LessonRepository lessonRepo,
                         CourseRepository courseRepo,
                         UserRepository userRepo, EnrollmentRepository enrollmentRepo) {
@@ -26,17 +29,18 @@ public class LessonService {
                 this.userRepo = userRepo;
                 this.enrollmentRepo = enrollmentRepo;
         }
+
         public LessonResponseDTO addLesson(Long courseId, CreateLessonRequestDTO dto) {
                 String email = SecurityContextHolder.getContext()
                                 .getAuthentication().getName();
-                User teacher = userRepo.findByEmail(email)
+                User user = userRepo.findByEmail(email)
                                 .orElseThrow(() -> new RuntimeException("User not found"));
-                if (teacher.getRole() != Role.TEACHER) {
-                        throw new RuntimeException("Only teachers can add lessons");
+                if (user.getRole() != Role.TEACHER && user.getRole() != Role.ADMIN) {
+                        throw new RuntimeException("Only teachers and admins can add lessons");
                 }
                 Course course = courseRepo.findById(courseId)
                                 .orElseThrow(() -> new RuntimeException("Course not found"));
-                if (!course.getTeacher().getId().equals(teacher.getId())) {
+                if (user.getRole() == Role.TEACHER && !course.getTeacher().getId().equals(user.getId())) {
                         throw new RuntimeException("You do not own this course");
                 }
                 Lesson lesson = new Lesson();
@@ -53,6 +57,7 @@ public class LessonService {
                                 saved.getLessonOrder(),
                                 saved.getDayNumber());
         }
+
         public List<LessonResponseDTO> getLessonsByCourse(Long courseId) {
                 String email = SecurityContextHolder.getContext()
                                 .getAuthentication().getName();
@@ -77,5 +82,21 @@ public class LessonService {
                                                 l.getLessonOrder(),
                                                 l.getDayNumber()))
                                 .toList();
+        }
+
+        public void deleteLesson(Long lessonId) {
+                String email = SecurityContextHolder.getContext()
+                                .getAuthentication().getName();
+                User user = userRepo.findByEmail(email)
+                                .orElseThrow(() -> new RuntimeException("User not found"));
+                Lesson lesson = lessonRepo.findById(lessonId)
+                                .orElseThrow(() -> new RuntimeException("Lesson not found"));
+                if (user.getRole() == Role.TEACHER) {
+                        Course course = lesson.getCourse();
+                        if (!course.getTeacher().getId().equals(user.getId())) {
+                                throw new RuntimeException("You can only delete lessons from your own courses");
+                        }
+                }
+                lessonRepo.delete(lesson);
         }
 }

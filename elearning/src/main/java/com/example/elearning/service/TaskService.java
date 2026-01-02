@@ -1,4 +1,5 @@
 package com.example.elearning.service;
+
 import com.example.elearning.dto.TaskDTO;
 import com.example.elearning.dto.request.CreateTaskRequest;
 import com.example.elearning.model.Course;
@@ -17,6 +18,7 @@ import com.example.elearning.model.TestCase;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+
 @Service
 public class TaskService {
     @Autowired
@@ -27,6 +29,7 @@ public class TaskService {
     private CourseRepository courseRepository;
     @Autowired
     private UserRepository userRepository;
+
     @Transactional
     public Task createTask(Long courseId, CreateTaskRequest request) {
         Course course = courseRepository.findById(courseId)
@@ -50,6 +53,7 @@ public class TaskService {
         }
         return taskRepository.save(task);
     }
+
     public List<TaskDTO> getTasksForCourse(Long courseId) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userRepository.findByEmail(email)
@@ -77,6 +81,7 @@ public class TaskService {
             return dto;
         }).collect(Collectors.toList());
     }
+
     @Transactional
     public void markTaskComplete(Long taskId) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -91,5 +96,21 @@ public class TaskService {
             completion.setCompleted(true);
             taskCompletionRepository.save(completion);
         }
+    }
+
+    @Transactional
+    public void deleteTask(Long taskId) {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        Task task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new RuntimeException("Task not found"));
+        if (user.getRole() == com.example.elearning.model.Role.TEACHER) {
+            Course course = task.getCourse();
+            if (!course.getTeacher().getId().equals(user.getId())) {
+                throw new RuntimeException("You can only delete tasks from your own courses");
+            }
+        }
+        taskRepository.delete(task);
     }
 }

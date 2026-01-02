@@ -1,4 +1,5 @@
 package com.example.elearning.config;
+
 import com.example.elearning.model.Course;
 import com.example.elearning.model.Lesson;
 import com.example.elearning.model.Role;
@@ -10,12 +11,14 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import java.time.LocalDateTime;
+
 @Component
 public class DataSeeder implements CommandLineRunner {
     private final UserRepository userRepo;
     private final CourseRepository courseRepo;
     private final LessonRepository lessonRepo;
     private final PasswordEncoder encoder;
+
     public DataSeeder(UserRepository userRepo, CourseRepository courseRepo, LessonRepository lessonRepo,
             PasswordEncoder encoder) {
         this.userRepo = userRepo;
@@ -23,6 +26,7 @@ public class DataSeeder implements CommandLineRunner {
         this.lessonRepo = lessonRepo;
         this.encoder = encoder;
     }
+
     @Override
     public void run(String... args) throws Exception {
         if (!userRepo.existsByEmail("teacher@example.com")) {
@@ -64,13 +68,13 @@ public class DataSeeder implements CommandLineRunner {
         if (lessonRepo.findByCourseId(course.getId()).isEmpty()) {
             Lesson lesson1 = new Lesson();
             lesson1.setTitle("Introduction to React");
-            lesson1.setVideoUrl("https:
+            lesson1.setVideoUrl("https://www.youtube.com/watch?v=SqcY0GlETPk");
             lesson1.setLessonOrder(1);
             lesson1.setCourse(course);
             lessonRepo.save(lesson1);
             Lesson lesson2 = new Lesson();
             lesson2.setTitle("Components & Props");
-            lesson2.setVideoUrl("https:
+            lesson2.setVideoUrl("https://www.youtube.com/watch?v=SqcY0GlETPk");
             lesson2.setLessonOrder(2);
             lesson2.setCourse(course);
             lessonRepo.save(lesson2);
