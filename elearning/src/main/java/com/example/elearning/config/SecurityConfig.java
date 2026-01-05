@@ -1,4 +1,5 @@
 package com.example.elearning.config;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -11,23 +12,27 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import com.example.elearning.security.JwtAuthFilter;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.http.HttpStatus;
+
 @Configuration
 public class SecurityConfig {
 	private final JwtAuthFilter jwtFilter;
+
 	public SecurityConfig(JwtAuthFilter jwtFilter) {
 		this.jwtFilter = jwtFilter;
 	}
+
 	@Bean
 	public PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
 	}
+
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 		http.cors(org.springframework.security.config.Customizer.withDefaults())
 				.csrf(csrf -> csrf.disable())
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.authorizeHttpRequests(auth -> auth
-						.requestMatchers("/api/authpreview").permitAll()
+						.requestMatchers("/api/auth/**").permitAll()
 						.requestMatchers("/api/certificates/verify/**").permitAll()
 						.requestMatchers("/api/admin/**").hasRole("ADMIN")
 						.requestMatchers("/api/progress/**").hasRole("STUDENT")
