@@ -180,8 +180,8 @@ const MyLearning = () => {
                                     >
                                         <Link to={`/course/${enrollment.courseId}/learn`}>
                                             <Card className="overflow-hidden hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 border-2 hover:border-primary/50 group">
-                                                <div className="flex">
-                                                    <div className="relative w-40 h-full bg-muted">
+                                                <div className="flex flex-col sm:flex-row h-full">
+                                                    <div className="relative w-full sm:w-40 h-48 sm:h-auto bg-muted shrink-0">
                                                         <img
                                                             src={getCourseImage(enrollment.courseTitle)}
                                                             alt={enrollment.courseTitle}
