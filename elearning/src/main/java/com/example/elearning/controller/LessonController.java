@@ -14,6 +14,8 @@ import com.example.elearning.dto.response.LessonResponseDTO;
 import com.example.elearning.service.LessonService;
 import jakarta.validation.Valid;
 
+import org.springframework.web.bind.annotation.PutMapping;
+
 @RestController
 @RequestMapping("/api/courses/{courseId}/lessons")
 public class LessonController {
@@ -32,6 +34,13 @@ public class LessonController {
 	@GetMapping
 	public List<LessonResponseDTO> getLesson(@PathVariable Long courseId) {
 		return service.getLessonsByCourse(courseId);
+	}
+
+	@PutMapping("/{lessonId}")
+	@PreAuthorize("hasRole('TEACHER') or hasRole('ADMIN')")
+	public LessonResponseDTO updateLesson(@PathVariable Long courseId, @PathVariable Long lessonId,
+			@Valid @RequestBody CreateLessonRequestDTO dto) {
+		return service.updateLesson(lessonId, dto);
 	}
 
 	@DeleteMapping("/{lessonId}")

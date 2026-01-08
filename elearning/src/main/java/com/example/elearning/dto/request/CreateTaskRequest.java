@@ -1,19 +1,25 @@
 package com.example.elearning.dto.request;
 
 import com.example.elearning.dto.TestCaseDTO;
+import com.example.elearning.dto.McqQuestionDTO;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import java.util.List;
 
 public class CreateTaskRequest {
     @NotBlank(message = "Task title is required")
     private String title;
+
     @NotBlank(message = "Task description is required")
     private String description;
-    @NotBlank(message = "Starter code is required")
-    private String starterCode;
-    @NotNull(message = "Test cases are required")
-    private List<TestCaseDTO> testCases;
+
+    private String taskType; // CODING, MCQ, or THEORY
+
+    private String starterCode; // For CODING tasks
+
+    private List<TestCaseDTO> testCases; // For CODING tasks
+
+    private List<McqQuestionDTO> mcqQuestions; // For MCQ tasks
+
     private Integer dayNumber = 1;
 
     public String getTitle() {
@@ -32,6 +38,14 @@ public class CreateTaskRequest {
         this.description = description;
     }
 
+    public String getTaskType() {
+        return taskType;
+    }
+
+    public void setTaskType(String taskType) {
+        this.taskType = taskType;
+    }
+
     public String getStarterCode() {
         return starterCode;
     }
@@ -46,6 +60,14 @@ public class CreateTaskRequest {
 
     public void setTestCases(List<TestCaseDTO> testCases) {
         this.testCases = testCases;
+    }
+
+    public List<McqQuestionDTO> getMcqQuestions() {
+        return mcqQuestions;
+    }
+
+    public void setMcqQuestions(List<McqQuestionDTO> mcqQuestions) {
+        this.mcqQuestions = mcqQuestions;
     }
 
     public Integer getDayNumber() {

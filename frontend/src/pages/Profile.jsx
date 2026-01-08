@@ -133,6 +133,9 @@ const Profile = () => {
                                                     <Calendar className="h-3 w-3" />
                                                     Joined Dec 2024
                                                 </Badge>
+                                                <Badge variant="secondary" className="gap-1">
+                                                    <span className="font-mono text-xs">ID: {user?.id}</span>
+                                                </Badge>
                                             </div>
                                             <p className="text-muted-foreground">{user?.email}</p>
                                         </div>

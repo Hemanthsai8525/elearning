@@ -1,0 +1,103 @@
+[COURSE]
+Title: Java Foundations Bootcamp
+Description: A hands-on Java course covering core programming concepts with daily lessons and practice tasks.
+Paid: true
+Price: 599.00
+Published: false
+
+[LESSON]
+Title: What is Java & Setting Up Environment
+VideoUrl: https://www.youtube.com/watch?v=grEKMHGYyns
+Order: 1
+Day: 1
+
+[LESSON]
+Title: Java Program Structure
+VideoUrl: https://www.youtube.com/watch?v=7WiJGTPuVeU
+Order: 2
+Day: 1
+
+[TASK]
+Title: Print Your Name
+Description: Write a Java program to print your name on the console.
+Day: 1
+StarterCode: public class Main { public static void main(String[] args) { // Print your name } }
+TestCase: (no input) | YourName
+
+[LESSON]
+Title: Variables and Data Types
+VideoUrl: https://www.youtube.com/watch?v=8cm1x4bC610
+Order: 1
+Day: 2
+
+[LESSON]
+Title: Operators in Java
+VideoUrl: https://www.youtube.com/watch?v=6Vd9bP8xN5M
+Order: 2
+Day: 2
+
+[TASK]
+Title: Multiply Two Numbers
+Description: Read two integers and print their multiplication result.
+Day: 2
+StarterCode: import java.util.Scanner; public class Main { public static void main(String[] args) { Scanner sc = new Scanner(System.in); int a = sc.nextInt(); int b = sc.nextInt(); // Print multiplication } }
+TestCase: 3 4 | 12
+TestCase: -2 5 | -10
+
+[LESSON]
+Title: Conditional Statements
+VideoUrl: https://www.youtube.com/watch?v=0r1SfRoLuzU
+Order: 1
+Day: 3
+
+[LESSON]
+Title: Switch Case in Java
+VideoUrl: https://www.youtube.com/watch?v=9fZ9D0Yz5rA
+Order: 2
+Day: 3
+
+[TASK]
+Title: Even or Odd Checker
+Description: Check whether a given number is even or odd.
+Day: 3
+StarterCode: import java.util.Scanner; public class Main { public static void main(String[] args) { Scanner sc = new Scanner(System.in); int n = sc.nextInt(); // Check even or odd } }
+TestCase: 4 | Even
+TestCase: 7 | Odd
+
+[LESSON]
+Title: Loops in Java
+VideoUrl: https://www.youtube.com/watch?v=6djggrlkHY8
+Order: 1
+Day: 4
+
+[LESSON]
+Title: While and Do-While Loops
+VideoUrl: https://www.youtube.com/watch?v=Q3q5g0mJH7I
+Order: 2
+Day: 4
+
+[TASK]
+Title: Print Numbers from 1 to N
+Description: Read a number N and print numbers from 1 to N.
+Day: 4
+StarterCode: import java.util.Scanner; public class Main { public static void main(String[] args) { Scanner sc = new Scanner(System.in); int n = sc.nextInt(); // Print numbers } }
+TestCase: 5 | 1 2 3 4 5
+
+[LESSON]
+Title: Arrays in Java
+VideoUrl: https://www.youtube.com/watch?v=ei_4Nt7XWOw
+Order: 1
+Day: 5
+
+[LESSON]
+Title: Introduction to Methods
+VideoUrl: https://www.youtube.com/watch?v=Yd4S4C2pEwA
+Order: 2
+Day: 5
+
+[TASK]
+Title: Find Largest Number
+Description: Read N numbers and print the largest number.
+Day: 5
+StarterCode: import java.util.Scanner; public class Main { public static void main(String[] args) { Scanner sc = new Scanner(System.in); int n = sc.nextInt(); int max = Integer.MIN_VALUE; for(int i=0;i<n;i++){ int x = sc.nextInt(); if(x > max) max = x; } System.out.println(max); } }
+TestCase: 5 1 3 9 2 7 | 9

@@ -84,6 +84,32 @@ public class LessonService {
                                 .toList();
         }
 
+        public LessonResponseDTO updateLesson(Long lessonId, CreateLessonRequestDTO dto) {
+                String email = SecurityContextHolder.getContext()
+                                .getAuthentication().getName();
+                User user = userRepo.findByEmail(email)
+                                .orElseThrow(() -> new RuntimeException("User not found"));
+                Lesson lesson = lessonRepo.findById(lessonId)
+                                .orElseThrow(() -> new RuntimeException("Lesson not found"));
+                if (user.getRole() == Role.TEACHER) {
+                        Course course = lesson.getCourse();
+                        if (!course.getTeacher().getId().equals(user.getId())) {
+                                throw new RuntimeException("You can only modify lessons from your own courses");
+                        }
+                }
+                lesson.setTitle(dto.getTitle());
+                lesson.setVideoUrl(dto.getVideoUrl());
+                lesson.setLessonOrder(dto.getLessonOrder());
+                lesson.setDayNumber(dto.getDayNumber() != null ? dto.getDayNumber() : 1);
+                Lesson saved = lessonRepo.save(lesson);
+                return new LessonResponseDTO(
+                                saved.getId(),
+                                saved.getTitle(),
+                                saved.getVideoUrl(),
+                                saved.getLessonOrder(),
+                                saved.getDayNumber());
+        }
+
         public void deleteLesson(Long lessonId) {
                 String email = SecurityContextHolder.getContext()
                                 .getAuthentication().getName();

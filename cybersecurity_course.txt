@@ -1,0 +1,187 @@
+[COURSE]
+Title: Complete Cybersecurity Fundamentals Course
+Description: Learn cybersecurity from scratch, covering threats, network security, cryptography, web security, and hands-on practical tasks with quizzes and theory assignments.
+Paid: true
+Price: 1299.00
+Published: false
+
+[LESSON]
+Title: Introduction to Cybersecurity
+VideoUrl: https://www.youtube.com/watch?v=inWWhr5tnEA
+Order: 1
+Day: 1
+
+[TASK]
+Type: THEORY
+Title: What is Cybersecurity?
+Description: Write a detailed explanation of cybersecurity, its importance in modern digital systems, common attack surfaces, and real-world examples of cyber attacks. Minimum 300 words.
+Day: 1
+
+[TASK]
+Type: MCQ
+Title: Cybersecurity Basics Quiz
+Description: Test your understanding of basic cybersecurity concepts
+Day: 1
+Question: What is cybersecurity?
+OptionA: Protecting physical buildings
+OptionB: Protecting computer systems and networks
+OptionC: Writing software code
+OptionD: Managing databases
+CorrectAnswer: B
+Question: Which of the following is a cyber threat?
+OptionA: Firewall
+OptionB: Antivirus
+OptionC: Malware
+OptionD: Backup
+CorrectAnswer: C
+Question: Which domain focuses on protecting data?
+OptionA: Network Security
+OptionB: Application Security
+OptionC: Information Security
+OptionD: Cloud Computing
+CorrectAnswer: C
+
+[LESSON]
+Title: Types of Cyber Attacks
+VideoUrl: https://www.youtube.com/watch?v=2K3l9zJXyRk
+Order: 2
+Day: 2
+
+[TASK]
+Type: THEORY
+Title: Cyber Attack Analysis
+Description: Explain different types of cyber attacks such as Malware, Phishing, Ransomware, DDoS, and Man-in-the-Middle attacks. Include examples and prevention techniques. Minimum 2 pages.
+Day: 2
+
+[TASK]
+Type: MCQ
+Title: Cyber Attacks Quiz
+Description: Identify various cyber attack techniques
+Day: 2
+Question: Which attack tricks users into revealing sensitive information?
+OptionA: DDoS
+OptionB: Phishing
+OptionC: Brute Force
+OptionD: SQL Injection
+CorrectAnswer: B
+Question: Which malware encrypts files and demands payment?
+OptionA: Trojan
+OptionB: Worm
+OptionC: Ransomware
+OptionD: Spyware
+CorrectAnswer: C
+
+[LESSON]
+Title: Network Security Fundamentals
+VideoUrl: https://www.youtube.com/watch?v=EJc6s0q6QhI
+Order: 3
+Day: 3
+
+[TASK]
+Type: CODING
+Title: Identify Secure Ports
+Description: Write a program that reads a port number and prints whether it is commonly considered secure (443, 22) or not.
+Day: 3
+StarterCode: import java.util.*; public class Main { public static void main(String[] args) { Scanner sc = new Scanner(System.in); int port = sc.nextInt(); if(port == 443 || port == 22) System.out.println("Secure"); else System.out.println("Not Secure"); } }
+TestCase: 443 | Secure
+TestCase: 22 | Secure
+TestCase: 80 | Not Secure
+
+[TASK]
+Type: MCQ
+Title: Network Security Quiz
+Description: Test your understanding of network security
+Day: 3
+Question: What does a firewall do?
+OptionA: Encrypts files
+OptionB: Blocks unauthorized network access
+OptionC: Creates backups
+OptionD: Detects hardware failure
+CorrectAnswer: B
+Question: Which protocol is secure for web traffic?
+OptionA: HTTP
+OptionB: FTP
+OptionC: HTTPS
+OptionD: Telnet
+CorrectAnswer: C
+
+[LESSON]
+Title: Cryptography Basics
+VideoUrl: https://www.youtube.com/watch?v=GSIDS_lvRv4
+Order: 4
+Day: 4
+
+[TASK]
+Type: THEORY
+Title: Cryptography Concepts
+Description: Explain cryptography concepts including encryption, decryption, symmetric encryption, asymmetric encryption, hashing, and real-world applications.
+Day: 4
+
+[TASK]
+Type: MCQ
+Title: Cryptography Quiz
+Description: Assess your cryptography knowledge
+Day: 4
+Question: Which algorithm uses a public and private key?
+OptionA: AES
+OptionB: DES
+OptionC: RSA
+OptionD: MD5
+CorrectAnswer: C
+Question: What is hashing mainly used for?
+OptionA: Encryption
+OptionB: Authentication
+OptionC: Data integrity
+OptionD: Compression
+CorrectAnswer: C
+
+[LESSON]
+Title: Web Application Security
+VideoUrl: https://www.youtube.com/watch?v=3Kq1MIfTWCE
+Order: 5
+Day: 5
+
+[TASK]
+Type: CODING
+Title: Detect SQL Injection Input
+Description: Write a program that reads a string input and checks if it contains common SQL injection patterns.
+Day: 5
+StarterCode: import java.util.*; public class Main { public static void main(String[] args) { Scanner sc = new Scanner(System.in); String input = sc.nextLine().toLowerCase(); if(input.contains(" or ") || input.contains("--") || input.contains("'")) System.out.println("Potential SQL Injection"); else System.out.println("Safe Input"); } }
+TestCase: admin' OR '1'='1 | Potential SQL Injection
+TestCase: normaluser | Safe Input
+
+[TASK]
+Type: THEORY
+Title: OWASP Top 10 Report
+Description: Prepare a detailed report on OWASP Top 10 vulnerabilities, explaining each vulnerability, its impact, and mitigation techniques. Minimum 3 pages.
+Day: 5
+
+[LESSON]
+Title: Cybersecurity Best Practices & Careers
+VideoUrl: https://www.youtube.com/watch?v=J8C9Xk4rFfU
+Order: 6
+Day: 6
+
+[TASK]
+Type: THEORY
+Title: Cybersecurity Career Path
+Description: Write an essay explaining different cybersecurity roles (SOC Analyst, Penetration Tester, Security Engineer), required skills, certifications, and career growth opportunities.
+Day: 6
+
+[TASK]
+Type: MCQ
+Title: Cybersecurity Careers Quiz
+Description: Evaluate your understanding of cybersecurity careers and best practices
+Day: 6
+Question: Which certification is beginner-friendly in cybersecurity?
+OptionA: CISSP
+OptionB: CEH
+OptionC: CompTIA Security+
+OptionD: OSCP
+CorrectAnswer: C
+Question: What is the principle of least privilege?
+OptionA: Giving maximum access
+OptionB: Giving minimum required access
+OptionC: Sharing passwords
+OptionD: Disabling security controls
+CorrectAnswer: B

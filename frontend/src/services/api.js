@@ -42,7 +42,16 @@ export const courseAPI = {
   getCoursePreview: (id) => api.get(`/courses/${id}/preview`),
   getCourseLessons: (id) => api.get(`/courses/${id}/lessons`),
   createCourse: (data) => api.post('/courses', data),
+  updateCourse: (id, data) => api.put(`/courses/${id}`, data),
   deleteCourse: (id) => api.delete(`/courses/${id}`),
+  importCourse: (formData) => {
+    // Remove Content-Type header to let browser set it with boundary
+    return api.post('/courses/import', formData, {
+      headers: {
+        'Content-Type': undefined
+      }
+    });
+  },
 };
 export const lessonAPI = {
   createLesson: (courseId, data) => api.post(`/courses/${courseId}/lessons`, data),
@@ -70,6 +79,28 @@ export const taskAPI = {
   markComplete: (taskId) => api.post(`/tasks/${taskId}/complete`),
   deleteTask: (taskId) => api.delete(`/tasks/${taskId}`)
 };
+
+export const mcqAPI = {
+  submitMcq: (data) => api.post('/mcq/submit', data),
+  getSubmission: (taskId) => api.get(`/mcq/${taskId}/submission`),
+};
+
+export const theoryAPI = {
+  submitTheory: (taskId, formData) => {
+    return api.post(`/theory/${taskId}/submit`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
+  },
+  getSubmission: (taskId) => api.get(`/theory/${taskId}/submission`),
+  getAllSubmissions: (taskId) => api.get(`/theory/task/${taskId}/submissions`),
+  reviewSubmission: (submissionId, data) => api.put(`/theory/submission/${submissionId}/review`, data),
+  downloadSubmission: (submissionId) => api.get(`/theory/submission/${submissionId}/download`, {
+    responseType: 'blob'
+  }),
+};
+
 export const paymentAPI = {
   pay: (courseId) => api.post(`/payments/pay/${courseId}`),
 };

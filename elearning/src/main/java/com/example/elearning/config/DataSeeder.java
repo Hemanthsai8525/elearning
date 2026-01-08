@@ -80,5 +80,12 @@ public class DataSeeder implements CommandLineRunner {
             lessonRepo.save(lesson2);
             System.out.println("✅ Seeded 2 Lessons.");
         }
+
+        // Fix for Lesson 94 video URL
+        lessonRepo.findById(94L).ifPresent(lesson -> {
+            lesson.setVideoUrl("https://www.youtube.com/watch?v=inWWhr5tnEA");
+            lessonRepo.save(lesson);
+            System.out.println("✅ Updated Lesson 94 video URL.");
+        });
     }
 }
