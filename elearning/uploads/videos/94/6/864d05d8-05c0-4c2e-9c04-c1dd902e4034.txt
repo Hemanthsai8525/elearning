@@ -1,0 +1,101 @@
+[COURSE]
+Title: DevOps Essentials Bootcamp
+Description: A practical DevOps course covering Linux, Git, CI/CD, Docker, Kubernetes, and Cloud fundamentals.
+Paid: true
+Price: 699.00
+Published: false
+
+[LESSON]
+Title: Introduction to DevOps
+VideoUrl: https://www.youtube.com/watch?v=0yWAtQ6wYNM
+Order: 1
+Day: 1
+
+[LESSON]
+Title: DevOps Lifecycle & Tools Overview
+VideoUrl: https://www.youtube.com/watch?v=9pZ2xmsSDdo
+Order: 2
+Day: 1
+
+[TASK]
+Title: DevOps Concepts Quiz
+Description: Write short notes on DevOps, CI, and CD.
+Day: 1
+StarterCode: // Write your answers in comments
+TestCase: (no input) | Completed
+
+[LESSON]
+Title: Linux Basics for DevOps
+VideoUrl: https://www.youtube.com/watch?v=iwolPf6kN-k
+Order: 1
+Day: 2
+
+[LESSON]
+Title: Shell Scripting Basics
+VideoUrl: https://www.youtube.com/watch?v=GtovwKDemnI
+Order: 2
+Day: 2
+
+[TASK]
+Title: Linux Commands Practice
+Description: List files, create a directory, and display current path.
+Day: 2
+StarterCode: # Use ls, mkdir, pwd commands
+TestCase: (no input) | Commands Executed
+
+[LESSON]
+Title: Git and GitHub Fundamentals
+VideoUrl: https://www.youtube.com/watch?v=SWYqp7iY_Tc
+Order: 1
+Day: 3
+
+[LESSON]
+Title: Branching and Merging
+VideoUrl: https://www.youtube.com/watch?v=FyAAIHHClqI
+Order: 2
+Day: 3
+
+[TASK]
+Title: Git Repository Setup
+Description: Initialize a git repo and push code to GitHub.
+Day: 3
+StarterCode: git init
+TestCase: (no input) | Repo Created
+
+[LESSON]
+Title: CI/CD with Jenkins
+VideoUrl: https://www.youtube.com/watch?v=6YZvp2GwT0A
+Order: 1
+Day: 4
+
+[LESSON]
+Title: Jenkins Pipeline Basics
+VideoUrl: https://www.youtube.com/watch?v=7KCS70sCoK0
+Order: 2
+Day: 4
+
+[TASK]
+Title: Create Jenkins Pipeline
+Description: Create a basic Jenkinsfile pipeline.
+Day: 4
+StarterCode: pipeline { agent any stages { stage('Build'){ steps{ echo 'Build Success' } } } }
+TestCase: (no input) | Pipeline Runs
+
+[LESSON]
+Title: Docker Fundamentals
+VideoUrl: https://www.youtube.com/watch?v=3c-iBn73dDE
+Order: 1
+Day: 5
+
+[LESSON]
+Title: Kubernetes Introduction
+VideoUrl: https://www.youtube.com/watch?v=X48VuDVv0do
+Order: 2
+Day: 5
+
+[TASK]
+Title: Dockerize an Application
+Description: Create a Dockerfile and build an image.
+Day: 5
+StarterCode: FROM openjdk:17
+TestCase: (no input) | Image Built

@@ -8,6 +8,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Map;
+import com.fasterxml.jackson.core.type.TypeReference;
 
 @Service
 public class McqService {
@@ -57,7 +58,8 @@ public class McqService {
         // Parse answers
         Map<String, String> answers;
         try {
-            answers = objectMapper.readValue(dto.getAnswers(), Map.class);
+            answers = objectMapper.readValue(dto.getAnswers(), new TypeReference<Map<String, String>>() {
+            });
         } catch (Exception e) {
             throw new RuntimeException("Invalid answers format");
         }
