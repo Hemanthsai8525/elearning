@@ -202,21 +202,32 @@ const CourseDetail = () => {
                                         {course.lessons?.map((lesson, idx) => (
                                             <div
                                                 key={lesson.id}
-                                                className="flex items-center justify-between p-4 rounded-lg hover:bg-muted/50 transition-colors group cursor-pointer"
+                                                className={`flex items-center justify-between p-4 rounded-lg hover:bg-muted/50 transition-colors group cursor-pointer ${enrolled ? 'hover:bg-primary/5' : ''}`}
+                                                onClick={() => {
+                                                    if (enrolled) {
+                                                        navigate(`/course/${id}/learn`, { state: { lessonId: lesson.id } });
+                                                    }
+                                                }}
                                             >
                                                 <div className="flex items-center gap-4">
                                                     <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-sm font-bold text-primary">
                                                         {idx + 1}
                                                     </div>
-                                                    <PlayCircle className="h-5 w-5 text-primary" />
+                                                    <PlayCircle className={`h-5 w-5 ${enrolled ? 'text-green-600' : 'text-primary'}`} />
                                                     <div>
                                                         <h4 className="font-semibold group-hover:text-primary transition-colors">
                                                             {lesson.title}
                                                         </h4>
-                                                        <span className="text-xs text-muted-foreground">Preview • 12:45</span>
+                                                        <span className="text-xs text-muted-foreground">
+                                                            {enrolled ? 'Play Lesson' : 'Preview • 12:45'}
+                                                        </span>
                                                     </div>
                                                 </div>
-                                                <ShieldCheck className="h-5 w-5 text-muted-foreground" />
+                                                {enrolled ? (
+                                                    <PlayCircle className="h-5 w-5 text-primary opacity-0 group-hover:opacity-100 transition-opacity" />
+                                                ) : (
+                                                    <ShieldCheck className="h-5 w-5 text-muted-foreground" />
+                                                )}
                                             </div>
                                         ))}
                                     </div>

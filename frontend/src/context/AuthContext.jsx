@@ -21,11 +21,12 @@ export const AuthProvider = ({ children }) => {
     }, []);
     const login = async (credentials) => {
         const response = await authAPI.login(credentials);
-        const { token, user: userData } = response.data;
+        const { token, user: userData, passwordChangeRequired } = response.data;
+        const extendedUser = { ...userData, passwordChangeRequired };
         localStorage.setItem('token', token);
-        localStorage.setItem('user', JSON.stringify(userData));
-        setUser(userData);
-        return userData;
+        localStorage.setItem('user', JSON.stringify(extendedUser));
+        setUser(extendedUser);
+        return extendedUser;
     };
     const register = async (data) => {
         const response = await authAPI.register(data);

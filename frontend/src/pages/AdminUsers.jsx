@@ -4,11 +4,20 @@ import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/Card'
 import { Badge } from '../components/ui/Badge';
 import { Button } from '../components/ui/Button';
 import { adminAPI } from '../services/api';
-import { Search, Filter, MoreVertical, ShieldCheck, DollarSign, Users as UsersIcon, GraduationCap, X, CheckCircle, AlertCircle, Plus, ArrowLeft } from 'lucide-react';
+import { Search, Filter, ShieldCheck, DollarSign, Users as UsersIcon, GraduationCap, X, AlertCircle } from 'lucide-react';
 import { Skeleton } from '../components/ui/Skeleton';
 import { cn } from '../lib/utils';
 import { useToast } from '../context/ToastContext';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '../components/ui/Dialog';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger
+} from '../components/ui/dropdown-menu'; // Assuming you have this component or use standard UI
+import { Ban, Trash, CheckCircle, Plus, ArrowLeft, MoreVertical } from 'lucide-react';
 const AdminUsers = () => {
     const navigate = useNavigate();
     const [users, setUsers] = useState([]);
@@ -18,29 +27,23 @@ const AdminUsers = () => {
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     const [newTeacher, setNewTeacher] = useState({ name: '', email: '', password: '' });
     const [submitLoading, setSubmitLoading] = useState(false);
+
+
+
     const { success, error } = useToast();
     useEffect(() => {
-        setTimeout(() => {
-            const mockUsers = generateMockUsers();
-            setUsers(mockUsers);
-            setLoading(false);
-        }, 1000);
+        fetchUsers();
     }, []);
-    const generateMockUsers = () => {
-        const roles = ['STUDENT', 'TEACHER', 'ADMIN'];
-        return Array.from({ length: 25 }, (_, i) => {
-            const role = i === 0 ? 'ADMIN' : i < 8 ? 'TEACHER' : 'STUDENT';
-            const revenue = role === 'TEACHER' ? Math.floor(Math.random() * 50000) + 5000 : 0;
-            return {
-                id: i + 1,
-                name: role === 'ADMIN' ? 'Admin User' : role === 'TEACHER' ? `Instructor ${i}` : `Student ${i}`,
-                email: `user${i + 1}@example.com`,
-                role: role,
-                joinedDate: new Date(Date.now() - Math.floor(Math.random() * 10000000000)).toLocaleDateString(),
-                revenue: revenue,
-                courseCount: role === 'TEACHER' ? Math.floor(Math.random() * 5) + 1 : 0
-            };
-        });
+
+    const fetchUsers = async () => {
+        try {
+            const response = await adminAPI.getAllUsers();
+            setUsers(response.data);
+        } catch (err) {
+            error('Failed to load users');
+        } finally {
+            setLoading(false);
+        }
     };
     const handleCreateTeacher = async (e) => {
         e.preventDefault();
@@ -48,22 +51,26 @@ const AdminUsers = () => {
         try {
             const res = await adminAPI.createTeacher(newTeacher);
             success(`Teacher ${res.data.name} created successfully!`);
-            const createdUser = {
-                id: users.length + 1,
-                name: res.data.name,
-                email: res.data.email,
-                role: 'TEACHER',
-                joinedDate: new Date().toLocaleDateString(),
-                revenue: 0,
-                courseCount: 0
-            };
-            setUsers([createdUser, ...users]);
+            fetchUsers();
             setNewTeacher({ name: '', email: '', password: '' });
             setIsAddModalOpen(false);
         } catch (err) {
             error(err.response?.data?.message || 'Failed to create teacher');
         } finally {
             setSubmitLoading(false);
+        }
+    };
+
+
+
+    const handleBlockToggle = async (user) => {
+        if (!window.confirm(`Are you sure you want to ${user.enabled ? 'block' : 'unblock'} this user?`)) return;
+        try {
+            await adminAPI.toggleBlock(user.id);
+            success(`User ${user.enabled ? 'blocked' : 'unblocked'} successfully`);
+            fetchUsers();
+        } catch (err) {
+            error('Failed to update user status');
         }
     };
     const filteredUsers = users.filter(user => {
@@ -89,6 +96,9 @@ const AdminUsers = () => {
                         <p className="text-muted-foreground">Manage students, teachers, and administrators.</p>
                     </div>
                     <div className="flex gap-2">
+                        <Button variant="destructive" variant="outline" className="border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700" onClick={() => navigate('/admin/blocked-users')}>
+                            <Ban className="mr-2 h-4 w-4" /> Blocked Users
+                        </Button>
                         <Button onClick={() => setIsAddModalOpen(true)}>
                             <Plus className="mr-2 h-4 w-4" /> Add Teacher
                         </Button>
@@ -182,7 +192,7 @@ const AdminUsers = () => {
                                                     </Badge>
                                                 </td>
                                                 <td className="py-4 text-muted-foreground">
-                                                    {user.joinedDate}
+                                                    {new Date(user.joinedDate).toLocaleDateString()}
                                                 </td>
                                                 <td className="py-4 text-center">
                                                     {user.role === 'TEACHER' ? (
@@ -199,9 +209,40 @@ const AdminUsers = () => {
                                                     )}
                                                 </td>
                                                 <td className="py-4 text-right">
-                                                    <Button variant="ghost" size="icon">
-                                                        <MoreVertical className="h-4 w-4" />
-                                                    </Button>
+                                                    <DropdownMenu>
+                                                        <DropdownMenuTrigger asChild>
+                                                            <Button variant="ghost" size="icon">
+                                                                <MoreVertical className="h-4 w-4" />
+                                                            </Button>
+                                                        </DropdownMenuTrigger>
+                                                        <DropdownMenuContent align="end">
+                                                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                                                            <DropdownMenuItem onClick={() => handleBlockToggle(user)} className="text-orange-600">
+                                                                {user.enabled !== false ? (
+                                                                    <>
+                                                                        <Ban className="mr-2 h-4 w-4" /> Block User
+                                                                    </>
+                                                                ) : (
+                                                                    <>
+                                                                        <CheckCircle className="mr-2 h-4 w-4" /> Unblock User
+                                                                    </>
+                                                                )}
+                                                            </DropdownMenuItem>
+                                                            <DropdownMenuSeparator />
+                                                            <DropdownMenuItem onClick={() => {
+                                                                if (window.confirm('Are you sure you want to delete this user?')) {
+                                                                    adminAPI.deleteUser(user.id)
+                                                                        .then(() => {
+                                                                            success('User deleted successfully');
+                                                                            fetchUsers();
+                                                                        })
+                                                                        .catch(() => error('Failed to delete user'));
+                                                                }
+                                                            }} className="text-red-600">
+                                                                <Trash className="mr-2 h-4 w-4" /> Delete User
+                                                            </DropdownMenuItem>
+                                                        </DropdownMenuContent>
+                                                    </DropdownMenu>
                                                 </td>
                                             </tr>
                                         ))
@@ -213,59 +254,60 @@ const AdminUsers = () => {
                 </Card>
             </div>
             <Dialog open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
-                <DialogContent className="max-w-md">
-                    <DialogHeader>
-                        <DialogTitle>Add New Teacher</DialogTitle>
-                        <DialogDescription>
-                            Create a new instructor account manually.
+                <DialogContent className="max-w-md p-6 bg-white/95 backdrop-blur-sm shadow-2xl border-0">
+                    <DialogHeader className="mb-4">
+                        <DialogTitle className="text-2xl font-bold bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">Add New Teacher</DialogTitle>
+                        <DialogDescription className="text-muted-foreground text-sm">
+                            Create a new instructor account manually. They will be asked to change their password on first login.
                         </DialogDescription>
                     </DialogHeader>
-                    <form onSubmit={handleCreateTeacher} className="space-y-4 pt-4">
+                    <form onSubmit={handleCreateTeacher} className="space-y-5">
                         <div className="space-y-2">
-                            <label className="text-sm font-medium">Full Name</label>
+                            <label className="text-sm font-semibold text-gray-700 ml-1">Full Name</label>
                             <input
                                 type="text"
                                 required
-                                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                                className="flex h-11 w-full rounded-lg border border-gray-200 bg-gray-50 px-4 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:border-primary transition-all duration-200"
                                 placeholder="e.g. Sarah Smith"
                                 value={newTeacher.name}
                                 onChange={e => setNewTeacher({ ...newTeacher, name: e.target.value })}
                             />
                         </div>
                         <div className="space-y-2">
-                            <label className="text-sm font-medium">Email Address</label>
+                            <label className="text-sm font-semibold text-gray-700 ml-1">Email Address</label>
                             <input
                                 type="email"
                                 required
-                                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                                className="flex h-11 w-full rounded-lg border border-gray-200 bg-gray-50 px-4 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:border-primary transition-all duration-200"
                                 placeholder="sarah@example.com"
                                 value={newTeacher.email}
                                 onChange={e => setNewTeacher({ ...newTeacher, email: e.target.value })}
                             />
                         </div>
                         <div className="space-y-2">
-                            <label className="text-sm font-medium">Password</label>
+                            <label className="text-sm font-semibold text-gray-700 ml-1">Temporary Password</label>
                             <input
                                 type="password"
                                 required
                                 minLength={6}
-                                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                                className="flex h-11 w-full rounded-lg border border-gray-200 bg-gray-50 px-4 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:border-primary transition-all duration-200"
                                 placeholder="••••••••"
                                 value={newTeacher.password}
                                 onChange={e => setNewTeacher({ ...newTeacher, password: e.target.value })}
                             />
                         </div>
-                        <div className="flex justify-end gap-3 pt-4">
-                            <Button type="button" variant="ghost" onClick={() => setIsAddModalOpen(false)}>
+                        <div className="flex justify-end gap-3 pt-6">
+                            <Button type="button" variant="ghost" onClick={() => setIsAddModalOpen(false)} className="hover:bg-gray-100">
                                 Cancel
                             </Button>
-                            <Button type="submit" disabled={submitLoading}>
+                            <Button type="submit" disabled={submitLoading} className="bg-primary hover:bg-primary/90 text-white shadow-md hover:shadow-lg transition-all">
                                 {submitLoading ? 'Creating...' : 'Create Teacher Account'}
                             </Button>
                         </div>
                     </form>
                 </DialogContent>
             </Dialog>
+
         </div>
     );
 };

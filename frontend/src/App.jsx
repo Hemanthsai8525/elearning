@@ -9,6 +9,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
+import SetPassword from './pages/SetPassword';
 import Courses from './pages/Courses';
 import CourseDetail from './pages/CourseDetail';
 import CourseLearning from './pages/CourseLearning';
@@ -18,6 +19,7 @@ import Certificates from './pages/Certificates';
 import TeacherDashboard from './pages/TeacherDashboard';
 import ManageCourse from './pages/ManageCourse';
 import AdminUsers from './pages/AdminUsers';
+import AdminBlockedUsers from './pages/AdminBlockedUsers';
 import AdminCourses from './pages/AdminCourses';
 import AdminAnalytics from './pages/AdminAnalytics';
 import BecomeTeacher from './pages/BecomeTeacher';
@@ -39,6 +41,14 @@ const AppContent = () => {
           <Route path="/register" element={<Register />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
+          <Route
+            path="/set-password"
+            element={
+              <ProtectedRoute>
+                <SetPassword />
+              </ProtectedRoute>
+            }
+          />
           <Route path="/courses" element={<Courses />} />
           <Route path="/courses/:id" element={<CourseDetail />} />
           <Route path="/become-teacher" element={<BecomeTeacher />} />
@@ -103,6 +113,14 @@ const AppContent = () => {
             element={
               <ProtectedRoute requiredRole="ADMIN">
                 <AdminUsers />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/blocked-users"
+            element={
+              <ProtectedRoute requiredRole="ADMIN">
+                <AdminBlockedUsers />
               </ProtectedRoute>
             }
           />

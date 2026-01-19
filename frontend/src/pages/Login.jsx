@@ -26,6 +26,10 @@ const Login = () => {
 
         try {
             const user = await login(formData);
+            if (user.passwordChangeRequired) {
+                navigate('/set-password');
+                return;
+            }
             if (user.role === 'TEACHER') {
                 navigate('/teach');
             } else if (user.role === 'STUDENT') {

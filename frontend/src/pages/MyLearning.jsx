@@ -178,7 +178,7 @@ const MyLearning = () => {
                                         animate={{ opacity: 1, y: 0 }}
                                         transition={{ delay: 0.3 + index * 0.05 }}
                                     >
-                                        <Link to={`/course/${enrollment.courseId}/learn`}>
+                                        <Link to={`/courses/${enrollment.courseId}`}>
                                             <Card className="overflow-hidden hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 border-2 hover:border-primary/50 group">
                                                 <div className="flex flex-col sm:flex-row h-full">
                                                     <div className="relative w-full sm:w-40 h-48 sm:h-auto bg-muted shrink-0">

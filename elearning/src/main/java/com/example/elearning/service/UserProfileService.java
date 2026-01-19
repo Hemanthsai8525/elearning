@@ -66,6 +66,17 @@ public class UserProfileService {
         userRepo.save(user);
     }
 
+    public void forceChangePassword(String newPassword) {
+        String email = SecurityContextHolder.getContext()
+                .getAuthentication().getName();
+        User user = userRepo.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        user.setPassword(passwordEncoder.encode(newPassword));
+        user.setPasswordChangeRequired(false);
+        userRepo.save(user);
+    }
+
     public void sendEmailVerification(User user) {
         String token = UUID.randomUUID().toString();
         user.setEmailVerificationToken(token);

@@ -2,8 +2,10 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import {
     BookOpen, User, LogOut, Award, LayoutDashboard, GraduationCap,
-    Users, Settings, ShieldCheck, Menu, X
+    Users, Settings, ShieldCheck, Menu, X, Bell
 } from 'lucide-react';
+import { notificationAPI } from '../services/api';
+
 import { ThemeToggle } from './ThemeToggle';
 import { Button } from './ui/Button';
 import { Badge } from './ui/Badge';
@@ -12,6 +14,36 @@ const Navbar = () => {
     const { user, logout, isAuthenticated } = useAuth();
     const navigate = useNavigate();
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const [notifications, setNotifications] = useState([]);
+    const [showNotifications, setShowNotifications] = useState(false);
+    const [unreadCount, setUnreadCount] = useState(0);
+
+    useState(() => {
+        if (isAuthenticated) {
+            fetchNotifications();
+            // Poll every minute
+            const interval = setInterval(fetchNotifications, 60000);
+            return () => clearInterval(interval);
+        }
+    }, [isAuthenticated]);
+
+    async function fetchNotifications() {
+        try {
+            const res = await notificationAPI.getMyNotifications();
+            setNotifications(res.data);
+            setUnreadCount(res.data.filter(n => !n.read).length);
+        } catch (error) {
+            console.error("Failed to fetch notifications");
+        }
+    }
+
+    const handleMarkAsRead = async (id) => {
+        try {
+            await notificationAPI.markAsRead(id);
+            setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
+            setUnreadCount(prev => Math.max(0, prev - 1));
+        } catch (error) { }
+    };
     const handleLogout = () => {
         logout();
         navigate('/');
@@ -73,6 +105,57 @@ const Navbar = () => {
                     {isAuthenticated ? (
                         <div className="flex items-center gap-3 ml-2">
                             <ThemeToggle />
+                            <div className="relative">
+                                <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={() => setShowNotifications(!showNotifications)}
+                                    className="relative"
+                                >
+                                    <Bell className="h-5 w-5" />
+                                    {unreadCount > 0 && (
+                                        <span className="absolute top-1 right-1 h-2.5 w-2.5 rounded-full bg-red-600 border-2 border-background animate-pulse"></span>
+                                    )}
+                                </Button>
+                                {showNotifications && (
+                                    <div className="absolute right-0 top-full mt-2 w-80 rounded-xl border bg-card text-card-foreground shadow-lg z-50 overflow-hidden">
+                                        <div className="p-3 border-b bg-muted/50 flex justify-between items-center">
+                                            <span className="font-semibold text-sm">Notifications</span>
+                                            {unreadCount > 0 && <span className="text-xs text-muted-foreground">{unreadCount} unread</span>}
+                                        </div>
+                                        <div className="max-h-[300px] overflow-y-auto custom-scrollbar">
+                                            {notifications.length === 0 ? (
+                                                <div className="p-8 text-center text-muted-foreground text-sm">
+                                                    No notifications yet
+                                                </div>
+                                            ) : (
+                                                notifications.map((notification) => (
+                                                    <div
+                                                        key={notification.id}
+                                                        className={`p-3 border-b last:border-0 hover:bg-muted/50 transition-colors cursor-pointer ${!notification.read ? 'bg-primary/5' : ''}`}
+                                                        onClick={() => {
+                                                            if (!notification.read) handleMarkAsRead(notification.id);
+
+                                                            if (notification.type === 'REVIEW' && notification.relatedEntityId) {
+                                                                navigate(`/course/${notification.relatedEntityId}/learn`);
+                                                                setShowNotifications(false);
+                                                            } else if (notification.type === 'SUBMISSION' && notification.relatedEntityId) {
+                                                                navigate(`/teach/assignments/${notification.relatedEntityId}`); // Assuming this route exists or will be created
+                                                                setShowNotifications(false);
+                                                            }
+                                                        }}
+                                                    >
+                                                        <p className="text-sm">{notification.message}</p>
+                                                        <p className="text-xs text-muted-foreground mt-1">
+                                                            {new Date(notification.createdAt).toLocaleDateString()}
+                                                        </p>
+                                                    </div>
+                                                ))
+                                            )}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
                             <div className="flex items-center gap-2">
                                 <Link to="/profile">
                                     <Button variant="ghost" size="icon" className="relative h-9 w-9 rounded-full">

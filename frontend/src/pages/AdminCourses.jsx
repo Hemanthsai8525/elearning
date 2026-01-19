@@ -14,6 +14,7 @@ const AdminCourses = () => {
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
     const { success, error } = useToast();
+    const [filter, setFilter] = useState('ALL'); // ALL, PUBLISHED, DRAFT, PAID, FREE
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [courseToDelete, setCourseToDelete] = useState(null);
     const [deleteLoading, setDeleteLoading] = useState(false);
@@ -25,7 +26,7 @@ const AdminCourses = () => {
             const response = await courseAPI.getAllCourses();
             const coursesWithStats = response.data.map(course => ({
                 ...course,
-                enrollmentCount: Math.floor(Math.random() * 200) + 5,
+                enrollmentCount: course.studentCount || 0,
             }));
             setCourses(coursesWithStats);
         } catch (error) {
@@ -53,10 +54,18 @@ const AdminCourses = () => {
             setCourseToDelete(null);
         }
     };
-    const filteredCourses = courses.filter(course =>
-        course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        course.teacherName?.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    const filteredCourses = courses.filter(course => {
+        const matchesSearch = course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            course.teacherName?.toLowerCase().includes(searchQuery.toLowerCase());
+
+        let matchesFilter = true;
+        if (filter === 'PUBLISHED') matchesFilter = course.published;
+        if (filter === 'DRAFT') matchesFilter = !course.published;
+        if (filter === 'PAID') matchesFilter = course.paid;
+        if (filter === 'FREE') matchesFilter = !course.paid;
+
+        return matchesSearch && matchesFilter;
+    });
     const totalRevenue = courses.reduce((sum, course) => sum + (course.paid ? course.price * course.enrollmentCount : 0), 0);
     return (
         <div className="min-h-screen bg-muted/5 py-8">
@@ -75,9 +84,17 @@ const AdminCourses = () => {
                         <p className="text-muted-foreground">Monitor and manage all courses across the platform.</p>
                     </div>
                     <div className="flex gap-2">
-                        <Button variant="outline">
-                            <Filter className="mr-2 h-4 w-4" /> Filter
-                        </Button>
+                        <select
+                            className="h-10 rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                            value={filter}
+                            onChange={(e) => setFilter(e.target.value)}
+                        >
+                            <option value="ALL">All Courses</option>
+                            <option value="PUBLISHED">Published</option>
+                            <option value="DRAFT">Drafts</option>
+                            <option value="PAID">Paid</option>
+                            <option value="FREE">Free</option>
+                        </select>
                         <Button>
                             <ShieldCheck className="mr-2 h-4 w-4" /> System Report
                         </Button>

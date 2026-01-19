@@ -53,6 +53,10 @@ public class AuthService {
 			throw new RuntimeException("Invalid credentials");
 		}
 
+		if (!user.isEnabled()) {
+			throw new RuntimeException("Your account is blocked by admin. Please contact admin.");
+		}
+
 		// Update Streak Logic
 		LocalDateTime now = LocalDateTime.now();
 		if (user.getLastLoginDate() == null) {
@@ -70,6 +74,6 @@ public class AuthService {
 		user = repo.save(user);
 
 		String token = jwtService.generateToken(user.getEmail(), user.getRole().name());
-		return new AuthResponseDTO(token, UserMapper.toDTO(user));
+		return new AuthResponseDTO(token, UserMapper.toDTO(user), user.isPasswordChangeRequired());
 	}
 }

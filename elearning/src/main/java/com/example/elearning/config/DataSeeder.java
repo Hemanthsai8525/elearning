@@ -39,6 +39,16 @@ public class DataSeeder implements CommandLineRunner {
             userRepo.save(teacher);
             System.out.println("✅ Seeded Teacher: teacher@example.com / teacher123");
         }
+        if (!userRepo.existsByEmail("admin@example.com")) {
+            User admin = new User();
+            admin.setName("Super Admin");
+            admin.setEmail("admin@example.com");
+            admin.setPassword(encoder.encode("admin123"));
+            admin.setRole(Role.ADMIN);
+            admin.setApproved(true);
+            userRepo.save(admin);
+            System.out.println("✅ Seeded Admin: admin@example.com / admin123");
+        }
         if (!userRepo.existsByEmail("student@example.com")) {
             User student = new User();
             student.setName("Alice Student");

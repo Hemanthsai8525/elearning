@@ -4,39 +4,35 @@ import {
     LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid,
     Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell, AreaChart, Area
 } from 'recharts';
-import { courseAPI } from '../services/api';
+import { courseAPI, adminAPI } from '../services/api';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Download, Calendar, TrendingUp, Users, DollarSign, ArrowLeft } from 'lucide-react';
 const AdminAnalytics = () => {
     const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
-    const [activeCoursesCount, setActiveCoursesCount] = useState(0);
     const [timeRange, setTimeRange] = useState('7d');
-    const revenueData = [
-        { name: 'Mon', revenue: 4000, students: 24 },
-        { name: 'Tue', revenue: 3000, students: 13 },
-        { name: 'Wed', revenue: 2000, students: 98 },
-        { name: 'Thu', revenue: 2780, students: 39 },
-        { name: 'Fri', revenue: 1890, students: 48 },
-        { name: 'Sat', revenue: 2390, students: 38 },
-        { name: 'Sun', revenue: 3490, students: 43 },
-    ];
-    const categoryData = [
-        { name: 'Web Dev', value: 400 },
-        { name: 'Mobile', value: 300 },
-        { name: 'Data Science', value: 300 },
-        { name: 'DevOps', value: 200 },
-    ];
+    const [stats, setStats] = useState({
+        totalRevenue: 0,
+        totalStudents: 0,
+        activeCourses: 0,
+        totalEnrollments: 0,
+        revenueData: [],
+        courseDistribution: []
+    });
+    // Use real data from stats
+    const revenueData = stats.revenueData || [];
+    const categoryData = stats.courseDistribution || [];
     const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
     useEffect(() => {
-        setTimeout(() => setLoading(false), 1000);
         const fetchStats = async () => {
             try {
-                const response = await courseAPI.getAllCourses();
-                setActiveCoursesCount(response.data.length);
+                const response = await adminAPI.getAnalytics();
+                setStats(response.data);
             } catch (error) {
-                console.error("Failed to fetch courses count", error);
+                console.error("Failed to fetch analytics", error);
+            } finally {
+                setLoading(false);
             }
         };
         fetchStats();
@@ -79,7 +75,7 @@ const AdminAnalytics = () => {
                                 <p className="text-sm font-medium text-muted-foreground">Total Revenue</p>
                                 <DollarSign className="h-4 w-4 text-green-500" />
                             </div>
-                            <div className="text-2xl font-bold">₹45,231</div>
+                            <div className="text-2xl font-bold">₹{stats.totalRevenue.toLocaleString()}</div>
                             <p className="text-xs text-green-500 flex items-center mt-1">
                                 <TrendingUp className="h-3 w-3 mr-1" /> +20.1% from last month
                             </p>
@@ -91,7 +87,7 @@ const AdminAnalytics = () => {
                                 <p className="text-sm font-medium text-muted-foreground">New Students</p>
                                 <Users className="h-4 w-4 text-blue-500" />
                             </div>
-                            <div className="text-2xl font-bold">+2350</div>
+                            <div className="text-2xl font-bold">{stats.totalStudents}</div>
                             <p className="text-xs text-green-500 flex items-center mt-1">
                                 <TrendingUp className="h-3 w-3 mr-1" /> +180.1% from last month
                             </p>
@@ -103,7 +99,7 @@ const AdminAnalytics = () => {
                                 <p className="text-sm font-medium text-muted-foreground">Active Courses</p>
                                 <TrendingUp className="h-4 w-4 text-orange-500" />
                             </div>
-                            <div className="text-2xl font-bold">{activeCoursesCount}</div>
+                            <div className="text-2xl font-bold">{stats.activeCourses}</div>
                             <p className="text-xs text-muted-foreground mt-1">
                                 +2 new this week
                             </p>
@@ -112,10 +108,10 @@ const AdminAnalytics = () => {
                     <Card>
                         <CardContent className="p-6">
                             <div className="flex items-center justify-between space-y-0 pb-2">
-                                <p className="text-sm font-medium text-muted-foreground">Completion Rate</p>
+                                <p className="text-sm font-medium text-muted-foreground">Total Enrollments</p>
                                 <TrendingUp className="h-4 w-4 text-purple-500" />
                             </div>
-                            <div className="text-2xl font-bold">24.5%</div>
+                            <div className="text-2xl font-bold">{stats.totalEnrollments}</div>
                             <p className="text-xs text-red-500 flex items-center mt-1">
                                 <TrendingUp className="h-3 w-3 mr-1 rotate-180" /> -4% from last month
                             </p>
@@ -130,7 +126,7 @@ const AdminAnalytics = () => {
                         </CardHeader>
                         <CardContent className="pl-2">
                             <div className="h-[300px] w-full">
-                                <ResponsiveContainer width="100%" height="100%">
+                                <ResponsiveContainer width="100%" height="100%" minWidth={0}>
                                     <AreaChart data={revenueData}>
                                         <defs>
                                             <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
@@ -159,7 +155,8 @@ const AdminAnalytics = () => {
                                         />
                                         <Area
                                             type="monotone"
-                                            dataKey="revenue"
+                                            dataKey="value"
+                                            name="Revenue"
                                             stroke="#8884d8"
                                             fillOpacity={1}
                                             fill="url(#colorRevenue)"
@@ -171,12 +168,12 @@ const AdminAnalytics = () => {
                     </Card>
                     <Card className="col-span-1 lg:col-span-3">
                         <CardHeader>
-                            <CardTitle>Popular Categories</CardTitle>
-                            <CardDescription>Distribution of student interest by topic.</CardDescription>
+                            <CardTitle>Course Distribution</CardTitle>
+                            <CardDescription>Paid vs Free courses.</CardDescription>
                         </CardHeader>
                         <CardContent>
                             <div className="h-[300px] w-full">
-                                <ResponsiveContainer width="100%" height="100%">
+                                <ResponsiveContainer width="100%" height="100%" minWidth={0}>
                                     <PieChart>
                                         <Pie
                                             data={categoryData}
@@ -210,7 +207,7 @@ const AdminAnalytics = () => {
                         </CardHeader>
                         <CardContent>
                             <div className="h-[250px] w-full">
-                                <ResponsiveContainer width="100%" height="100%">
+                                <ResponsiveContainer width="100%" height="100%" minWidth={0}>
                                     <BarChart data={revenueData}>
                                         <CartesianGrid strokeDasharray="3 3" vertical={false} />
                                         <XAxis dataKey="name" stroke="#888888" fontSize={12} tickLine={false} axisLine={false} />
@@ -219,7 +216,7 @@ const AdminAnalytics = () => {
                                             cursor={{ fill: 'transparent' }}
                                             contentStyle={{ backgroundColor: 'hsl(var(--card))', borderColor: 'hsl(var(--border))' }}
                                         />
-                                        <Bar dataKey="students" fill="#adfa1d" radius={[4, 4, 0, 0]} />
+                                        <Bar dataKey="value" name="Revenue" fill="#adfa1d" radius={[4, 4, 0, 0]} />
                                     </BarChart>
                                 </ResponsiveContainer>
                             </div>

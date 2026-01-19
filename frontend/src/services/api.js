@@ -35,6 +35,7 @@ export const userAPI = {
   getProfile: () => api.get('/users/profile'),
   updateProfile: (data) => api.put('/users/profile', data),
   changePassword: (data) => api.put('/users/change-password', data),
+  forceChangePassword: (newPassword) => api.put('/users/force-change-password', { newPassword }),
   resendVerification: () => api.get('/users/resend-verification'),
 };
 export const courseAPI = {
@@ -106,5 +107,14 @@ export const paymentAPI = {
 };
 export const adminAPI = {
   createTeacher: (data) => api.post('/admin/create-teacher', data),
+  getAllUsers: () => api.get('/admin/users'),
+  getAnalytics: () => api.get('/admin/analytics'),
+  deleteUser: (id) => api.delete(`/admin/users/${id}`),
+  updateRole: (id, role) => api.put(`/admin/users/${id}/role`, { role }),
+  toggleBlock: (id) => api.put(`/admin/users/${id}/block`),
+};
+export const notificationAPI = {
+  getMyNotifications: () => api.get('/notifications'),
+  markAsRead: (id) => api.put(`/notifications/${id}/read`),
 };
 export default api;

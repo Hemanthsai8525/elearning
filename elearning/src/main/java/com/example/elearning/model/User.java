@@ -159,4 +159,14 @@ public class User {
 	public void setCurrentStreak(int currentStreak) {
 		this.currentStreak = currentStreak;
 	}
+
+	private boolean passwordChangeRequired = false;
+
+	public boolean isPasswordChangeRequired() {
+		return passwordChangeRequired;
+	}
+
+	public void setPasswordChangeRequired(boolean passwordChangeRequired) {
+		this.passwordChangeRequired = passwordChangeRequired;
+	}
 }

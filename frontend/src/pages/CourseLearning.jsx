@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import YouTube from 'react-youtube';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { courseAPI, progressAPI, certificateAPI, taskAPI, mcqAPI, theoryAPI } from '../services/api';
 import {
@@ -25,6 +25,7 @@ const CourseLearning = () => {
     const { courseId } = useParams();
     const { user } = useAuth();
     const navigate = useNavigate();
+    const location = useLocation();
     const [lessons, setLessons] = useState([]);
     const [currentLesson, setCurrentLesson] = useState(null);
     const [progress, setProgress] = useState(null);
@@ -45,6 +46,11 @@ const CourseLearning = () => {
     const [theorySubmission, setTheorySubmission] = useState(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [videoError, setVideoError] = useState(false);
+
+    const showToast = (type, text) => {
+        setToast({ type, text });
+        setTimeout(() => setToast(null), 3000);
+    };
     useEffect(() => {
         fetchCourseData();
     }, [courseId]);
@@ -61,10 +67,17 @@ const CourseLearning = () => {
                 courseAPI.getCourseLessons(courseId),
                 taskAPI.getTasks(courseId)
             ]);
+
             setLessons(lessonsRes.data);
             setTasks(tasksRes.data);
             if (lessonsRes.data.length > 0) {
-                setCurrentLesson(lessonsRes.data[0]);
+                // Check if a specific lesson ID was passed via navigation state
+                const targetLessonId = location.state?.lessonId;
+                const targetLesson = targetLessonId
+                    ? lessonsRes.data.find(l => l.id === targetLessonId)
+                    : lessonsRes.data[0];
+
+                setCurrentLesson(targetLesson || lessonsRes.data[0]);
             }
             try {
                 const progressRes = await progressAPI.getProgress(courseId);
@@ -87,8 +100,8 @@ const CourseLearning = () => {
         console.log('Marking lesson complete:', lessonId);
         try {
             setCompletedLessons(prev => new Set([...prev, lessonId]));
-            setToast({ type: 'success', text: 'Lesson Completed!' });
-            setTimeout(() => setToast(null), 3000);
+            setCompletedLessons(prev => new Set([...prev, lessonId]));
+            showToast('success', 'Lesson Completed!');
             await progressAPI.markComplete(courseId, lessonId);
             const progressRes = await progressAPI.getProgress(courseId);
             setProgress(progressRes.data);
@@ -189,9 +202,17 @@ const CourseLearning = () => {
                 )}
             </AnimatePresence>
             <div className={cn(
-                "flex-1 flex flex-col transition-all duration-300",
+                "flex-1 flex flex-col transition-all duration-300 relative",
                 sidebarOpen ? "lg:mr-96" : ""
             )}>
+                <Button
+                    variant="ghost"
+                    className="absolute top-4 left-4 z-10 bg-black/50 hover:bg-black/70 text-white border border-white/10 backdrop-blur-sm"
+                    onClick={() => navigate(`/courses/${courseId}`)}
+                >
+                    <ArrowLeft size={18} className="mr-2" />
+                    Back to Course
+                </Button>
                 {!activeTask && (
                     <div className="bg-black relative group flex-shrink-0 bg-zinc-950 flex flex-col justify-center">
                         {currentLesson && currentLesson.videoUrl && getVideoId(currentLesson.videoUrl) ? (
@@ -416,6 +437,7 @@ const CourseLearning = () => {
                                                                                     t.id === activeTask.id ? { ...t, completed: true } : t
                                                                                 ));
                                                                                 setToast({ type: 'success', text: 'Task completed! Great job!' });
+                                                                                setTimeout(() => setToast(null), 3000);
                                                                             } catch (err) {
                                                                                 setToast({ type: 'error', text: 'Failed to save completion' });
                                                                             }
@@ -606,7 +628,7 @@ const CourseLearning = () => {
                                                                             formData.append('file', theoryFile);
                                                                             const res = await theoryAPI.submitTheory(activeTask.id, formData);
                                                                             setTheorySubmission(res.data);
-                                                                            setToast({ type: 'success', text: 'Assignment submitted successfully!' });
+                                                                            showToast('success', 'Assignment submitted successfully!');
                                                                         } catch (error) {
                                                                             setToast({ type: 'error', text: error.response?.data?.message || 'Failed to upload file' });
                                                                         } finally {
@@ -725,6 +747,7 @@ const CourseLearning = () => {
                                                                             }
 
                                                                             setToast({ type: 'success', text: 'Quiz submitted successfully!' });
+                                                                            setTimeout(() => setToast(null), 3000);
                                                                         } catch (error) {
                                                                             setToast({ type: 'error', text: error.response?.data?.message || 'Failed to submit quiz' });
                                                                         } finally {
