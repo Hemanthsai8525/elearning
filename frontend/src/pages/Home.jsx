@@ -9,6 +9,7 @@ import { Button } from '../components/ui/Button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/Card';
 import { Badge } from '../components/ui/Badge';
 import { useAuth } from '../context/AuthContext';
+import TechDemo from '../components/TechDemo';
 const Home = () => {
     const { user } = useAuth();
     const getDashboardLink = () => {
@@ -294,30 +295,25 @@ const Home = () => {
                             whileInView={{ opacity: 1, x: 0 }}
                             transition={{ duration: 0.8 }}
                             viewport={{ once: true }}
-                            className="relative rounded-3xl overflow-hidden shadow-2xl border-4 border-white dark:border-zinc-800 bg-black"
+                            className="relative"
                         >
-                            <div className="aspect-video relative group">
-                                <video
-                                    src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
-                                    className="w-full h-full object-cover"
-                                    controls
-                                    autoPlay
-                                    muted
-                                    loop
-                                    playsInline
-                                >
-                                    Your browser does not support the video tag.
-                                </video>
-                                <div className="absolute inset-0 bg-black/10 pointer-events-none group-hover:bg-transparent transition-colors"></div>
-                            </div>
-                            <div className="absolute bottom-6 right-6 bg-white/90 dark:bg-zinc-900/90 backdrop-blur-md px-4 py-2 rounded-xl border shadow-lg flex items-center gap-2">
-                                <div className="flex -space-x-2">
+                            <TechDemo />
+
+                            {/* Decorative Elements around the demo */}
+                            <div className="absolute -top-12 -left-12 w-64 h-64 bg-primary/20 rounded-full blur-[100px] -z-10" />
+                            <div className="absolute -bottom-12 -right-12 w-64 h-64 bg-purple-500/20 rounded-full blur-[100px] -z-10" />
+
+                            <div className="absolute -bottom-6 -right-6 bg-card/80 backdrop-blur-xl px-5 py-3 rounded-2xl border shadow-2xl flex items-center gap-4 z-20 animate-bounce-slow">
+                                <div className="flex -space-x-3">
                                     {[...Array(4)].map((_, i) => (
-                                        <div key={i} className={`w-8 h-8 rounded-full border-2 border-white dark:border-zinc-900 bg-gradient-to-br ${i % 2 === 0 ? 'from-blue-500 to-cyan-500' : 'from-purple-500 to-pink-500'}`} />
+                                        <div key={i} className={`w-10 h-10 rounded-full border-2 border-background bg-gradient-to-br ${i % 2 === 0 ? 'from-blue-500 to-cyan-500' : 'from-purple-500 to-pink-500'} flex items-center justify-center text-[10px] font-bold text-white shadow-lg`}>
+                                            {i === 3 ? '50k+' : ''}
+                                        </div>
                                     ))}
                                 </div>
-                                <div className="text-xs font-bold leading-tight">
-                                    Used by 50k+<br />Developers
+                                <div>
+                                    <div className="font-bold text-sm">Join the Community</div>
+                                    <div className="text-xs text-muted-foreground">Devs shipping daily</div>
                                 </div>
                             </div>
                         </motion.div>
