@@ -166,6 +166,43 @@ const CourseLearning = () => {
             return '';
         }
     };
+    const getDriveEmbedUrl = (url) => {
+        if (!url) return null;
+        const regExp = /\/file\/d\/([a-zA-Z0-9_-]+)/;
+        const match = url.match(regExp);
+        if (match && match[1]) {
+            return `https://drive.google.com/file/d/${match[1]}/preview`;
+        }
+        return null;
+    };
+
+    const isDriveUrl = (url) => {
+        return url && (url.includes('drive.google.com') || url.includes('docs.google.com'));
+    };
+
+    // State for Drive video auto-completion
+    const [autoCompleteTimer, setAutoCompleteTimer] = useState(30);
+
+    useEffect(() => {
+        let interval;
+        if (currentLesson && isDriveUrl(currentLesson.videoUrl) && !completedLessons.has(currentLesson.id)) {
+            // Reset timer when lesson changes
+            setAutoCompleteTimer(30);
+
+            interval = setInterval(() => {
+                setAutoCompleteTimer((prev) => {
+                    if (prev <= 1) {
+                        clearInterval(interval);
+                        markLessonComplete(currentLesson.id);
+                        return 0;
+                    }
+                    return prev - 1;
+                });
+            }, 1000);
+        }
+        return () => clearInterval(interval);
+    }, [currentLesson, completedLessons]);
+
     if (loading) {
         return (
             <div className="flex h-screen bg-background">
@@ -215,55 +252,96 @@ const CourseLearning = () => {
                 </Button>
                 {!activeTask && (
                     <div className="bg-black relative group flex-shrink-0 bg-zinc-950 flex flex-col justify-center">
-                        {currentLesson && currentLesson.videoUrl && getVideoId(currentLesson.videoUrl) ? (
-                            videoError ? (
-                                <div className="aspect-video w-full flex flex-col items-center justify-center text-white bg-zinc-900 border-b border-zinc-800">
-                                    <div className="text-center p-6 max-w-md">
-                                        <div className="bg-zinc-800 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                                            <PlayCircle className="w-8 h-8 text-zinc-500" />
-                                        </div>
-                                        <h3 className="text-lg font-bold mb-2">Video Unavailable in Player</h3>
-                                        <p className="text-sm text-zinc-400 mb-6">
-                                            The owner of this video has disabled playback on other websites. You can still watch it directly on YouTube.
-                                        </p>
-                                        <a
-                                            href={currentLesson.videoUrl}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="inline-flex items-center gap-2 px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition-colors"
+                        {currentLesson && currentLesson.videoUrl ? (
+                            isDriveUrl(currentLesson.videoUrl) ? (
+                                <div className="w-full relative pt-[56.25%] bg-black">
+                                    <iframe
+                                        src={getDriveEmbedUrl(currentLesson.videoUrl)}
+                                        className="absolute top-0 left-0 w-full h-full border-0"
+                                        allow="autoplay; encrypted-media"
+                                        allowFullScreen
+                                        title="Course Video"
+                                    ></iframe>
+                                    <div className="absolute top-4 left-1/2 -translate-x-1/2 z-20">
+                                        <Button
+                                            size="sm"
+                                            className={cn(
+                                                "gap-2 shadow-lg backdrop-blur-md transition-all duration-500",
+                                                completedLessons.has(currentLesson.id)
+                                                    ? "bg-green-600/90 hover:bg-green-700/90 text-white"
+                                                    : "bg-black/50 hover:bg-black/70 text-white border border-white/20"
+                                            )}
+                                            onClick={() => markLessonComplete(currentLesson.id)}
+                                            disabled={completedLessons.has(currentLesson.id)}
                                         >
-                                            <Play size={16} fill="currentColor" /> Watch on YouTube <ExternalLink size={14} />
-                                        </a>
+                                            {completedLessons.has(currentLesson.id) ? (
+                                                <><CheckCircle size={16} /> Completed</>
+                                            ) : (
+                                                <>
+                                                    <div className="w-4 h-4 rounded-full border-2 border-white/30 border-t-white animate-spin mr-1" />
+                                                    Auto-completing in {autoCompleteTimer}s
+                                                </>
+                                            )}
+                                        </Button>
                                     </div>
                                 </div>
+                            ) : getVideoId(currentLesson.videoUrl) ? (
+                                videoError ? (
+                                    <div className="aspect-video w-full flex flex-col items-center justify-center text-white bg-zinc-900 border-b border-zinc-800">
+                                        <div className="text-center p-6 max-w-md">
+                                            <div className="bg-zinc-800 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                                                <PlayCircle className="w-8 h-8 text-zinc-500" />
+                                            </div>
+                                            <h3 className="text-lg font-bold mb-2">Video Unavailable in Player</h3>
+                                            <p className="text-sm text-zinc-400 mb-6">
+                                                The owner of this video has disabled playback on other websites. You can still watch it directly on YouTube.
+                                            </p>
+                                            <a
+                                                href={currentLesson.videoUrl}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="inline-flex items-center gap-2 px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition-colors"
+                                            >
+                                                <Play size={16} fill="currentColor" /> Watch on YouTube <ExternalLink size={14} />
+                                            </a>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="w-full relative pt-[56.25%] bg-black">
+                                        <div className="absolute top-0 left-0 w-full h-full">
+                                            <YouTube
+                                                className="w-full h-full"
+                                                iframeClassName="w-full h-full absolute top-0 left-0"
+                                                videoId={getVideoId(currentLesson.videoUrl)}
+                                                opts={{
+                                                    height: '100%',
+                                                    width: '100%',
+                                                    playerVars: {
+                                                        autoplay: 1,
+                                                        origin: window.location.origin,
+                                                    },
+                                                }}
+                                                onEnd={() => {
+                                                    console.log('Video ended event fired for:', currentLesson.title);
+                                                    markLessonComplete(currentLesson.id);
+                                                }}
+                                                onError={(e) => {
+                                                    console.error('Video Error:', e);
+                                                    if (e.data === 150 || e.data === 101) {
+                                                        setVideoError(true);
+                                                    } else {
+                                                        setToast({ type: 'error', text: 'Error loading video.' });
+                                                    }
+                                                }}
+                                            />
+                                        </div>
+                                    </div>
+                                )
                             ) : (
-                                <div className="w-full relative pt-[56.25%] bg-black">
-                                    <div className="absolute top-0 left-0 w-full h-full">
-                                        <YouTube
-                                            className="w-full h-full"
-                                            iframeClassName="w-full h-full absolute top-0 left-0"
-                                            videoId={getVideoId(currentLesson.videoUrl)}
-                                            opts={{
-                                                height: '100%',
-                                                width: '100%',
-                                                playerVars: {
-                                                    autoplay: 1,
-                                                    origin: window.location.origin,
-                                                },
-                                            }}
-                                            onEnd={() => {
-                                                console.log('Video ended event fired for:', currentLesson.title);
-                                                markLessonComplete(currentLesson.id);
-                                            }}
-                                            onError={(e) => {
-                                                console.error('Video Error:', e);
-                                                if (e.data === 150 || e.data === 101) {
-                                                    setVideoError(true);
-                                                } else {
-                                                    setToast({ type: 'error', text: 'Error loading video.' });
-                                                }
-                                            }}
-                                        />
+                                <div className="aspect-video w-full flex flex-col items-center justify-center text-white bg-zinc-900">
+                                    <div className="text-center p-6">
+                                        <p className="text-red-400 mb-2 font-bold">Video Unavailable</p>
+                                        <p className="text-sm text-zinc-500">The provided video URL is not supported or invalid.</p>
                                     </div>
                                 </div>
                             )

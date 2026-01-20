@@ -91,6 +91,31 @@ public class DataSeeder implements CommandLineRunner {
             System.out.println("✅ Seeded 2 Lessons.");
         }
 
+        // Seed DevOps Course with Drive Link
+        if (courseRepo.findByTeacherId(teacher.getId()).stream()
+                .noneMatch(c -> c.getTitle().equals("DevOps Bootcamp"))) {
+            Course devOpsCourse = new Course();
+            devOpsCourse.setTitle("DevOps Bootcamp");
+            devOpsCourse.setDescription("Learn DevOps from scratch.");
+            devOpsCourse.setPaid(false);
+            devOpsCourse.setPrice(0.0);
+            devOpsCourse.setTeacher(teacher);
+            devOpsCourse.setPublished(true);
+            devOpsCourse.setCreatedAt(LocalDateTime.now());
+            devOpsCourse = courseRepo.save(devOpsCourse);
+
+            Lesson driveLesson = new Lesson();
+            driveLesson.setTitle("DevOps Introduction (Drive Video)");
+            // Using the specific Drive link provided
+            driveLesson.setVideoUrl(
+                    "https://drive.google.com/file/d/1lf8PSZe3je9TvxoUNLIBwl8v-vFdz77j/view?usp=drive_link");
+            driveLesson.setLessonOrder(1);
+            driveLesson.setCourse(devOpsCourse);
+            lessonRepo.save(driveLesson);
+
+            System.out.println("✅ Seeded DevOps Course with Drive Video.");
+        }
+
         // Fix for Lesson 94 video URL
         lessonRepo.findById(94L).ifPresent(lesson -> {
             lesson.setVideoUrl("https://www.youtube.com/watch?v=inWWhr5tnEA");
